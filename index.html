@@ -153,6 +153,31 @@
   .dietary-card .diet{font-size:0.85rem;color:var(--text-muted);min-height:20px;}
   .dietary-card .diet.empty{font-style:italic;color:rgba(160,168,192,0.5);}
 
+  /* ===== LOGIN SCREEN ===== */
+  #login-screen{position:fixed;inset:0;z-index:1000;background:var(--dark);display:flex;align-items:center;justify-content:center;padding:24px;}
+  #login-screen.hidden{display:none;}
+  #app-content.hidden{display:none;}
+  .login-card{background:var(--dark-card);border-radius:16px;padding:40px 32px;max-width:400px;width:100%;border:1px solid rgba(201,168,76,0.2);text-align:center;}
+  .login-card h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--gold);margin-bottom:4px;}
+  .login-card .login-subtitle{color:var(--text-muted);font-size:0.95rem;margin-bottom:28px;}
+  .login-card .login-field{margin-bottom:14px;text-align:left;}
+  .login-card .login-field label{display:block;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:4px;}
+  .login-card .login-field input{width:100%;padding:12px 16px;border-radius:8px;border:1px solid rgba(201,168,76,0.3);background:var(--dark-surface);color:var(--text);font-family:'Inter',sans-serif;font-size:0.95rem;}
+  .login-card .login-field input:focus{outline:none;border-color:var(--gold);}
+  .login-card .login-field input::placeholder{color:var(--text-muted);}
+  .login-error{color:var(--accent);font-size:0.85rem;margin-bottom:12px;min-height:20px;}
+  .login-btn{width:100%;padding:14px;border-radius:8px;border:none;background:var(--gold);color:var(--dark);font-family:'Inter',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;margin-bottom:16px;transition:opacity 0.2s;}
+  .login-btn:hover{opacity:0.9;}
+  .login-btn:disabled{opacity:0.5;cursor:not-allowed;}
+  .login-toggle{color:var(--gold);font-size:0.85rem;cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif;text-decoration:underline;text-underline-offset:2px;}
+  .login-toggle:hover{opacity:0.8;}
+  .invite-field{display:none;}
+  .invite-field.show{display:block;}
+  #sign-out-btn{position:absolute;top:16px;right:16px;z-index:2;padding:6px 16px;border-radius:20px;border:1px solid rgba(201,168,76,0.3);background:transparent;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:0.78rem;cursor:pointer;transition:all 0.2s;}
+  #sign-out-btn:hover{border-color:var(--gold);color:var(--text);}
+  .hero-identity{font-size:0.85rem;color:var(--text-muted);margin-top:8px;position:relative;z-index:1;}
+  .hero-identity strong{color:var(--gold);}
+
   /* ===== RESPONSIVE ===== */
   @media(max-width:600px){
     .hero{padding:40px 16px 24px;}
@@ -165,16 +190,46 @@
     .bring-item{flex-direction:column;align-items:flex-start;}
     .bring-item-right{width:100%;justify-content:flex-end;}
     .message-grid{grid-template-columns:1fr;}
+    .login-card{padding:28px 20px;}
+    #sign-out-btn{top:10px;right:10px;font-size:0.72rem;padding:5px 12px;}
   }
 </style>
 </head>
 <body>
 
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-card">
+    <h1>MZ's 40th</h1>
+    <div class="login-subtitle">Sign in to join the planning</div>
+    <div id="login-error" class="login-error"></div>
+    <div class="login-field">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="your@email.com" autocomplete="email">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
+    </div>
+    <div class="login-field invite-field" id="invite-field">
+      <label>Invite Code</label>
+      <input type="text" id="invite-code" placeholder="Enter the invite code" autocomplete="off">
+    </div>
+    <button class="login-btn" id="login-btn" onclick="doAuth()">Sign In</button>
+    <button class="login-toggle" id="login-toggle" onclick="toggleAuthMode()">Need an account? Sign up</button>
+  </div>
+</div>
+
+<!-- APP CONTENT (hidden until authenticated) -->
+<div id="app-content" class="hidden">
+
 <!-- HERO -->
 <div class="hero">
+  <button id="sign-out-btn" onclick="doSignOut()">Sign out</button>
   <h1>MZ's 40th Birthday</h1>
   <div class="subtitle">A long weekend at a villa in Mézy-sur-Seine, France</div>
   <div class="dates-badge">Fri 1 May – Mon 4 May 2026</div>
+  <div class="hero-identity">Signed in as <strong id="hero-guest-name"></strong></div>
 </div>
 
 <!-- COUNTDOWN -->
@@ -202,12 +257,14 @@
   <div class="tab-content active" id="tab-overview">
     <div class="section-label">The Crew</div>
     <div class="guest-grid" style="margin-bottom:24px;">
-      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--gold),var(--accent));">MZ</div><div class="guest-name">MZ</div><div class="guest-role">Birthday legend</div></div>
-      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--accent),var(--gold));">W</div><div class="guest-name">Wife</div><div class="guest-role">Partner</div></div>
-      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--green),var(--blue));">S</div><div class="guest-name">Son</div><div class="guest-role">Chief explorer (age 3)</div></div>
-      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--blue),var(--purple));">B</div><div class="guest-name">Brother</div><div class="guest-role">Sibling</div></div>
-      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--pink),var(--accent));">S</div><div class="guest-name">Sister</div><div class="guest-role">Sibling</div></div>
-      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--purple),var(--gold));">C</div><div class="guest-name">Cousin</div><div class="guest-role">Family</div></div>
+      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--gold),var(--accent));">MZ</div><div class="guest-name">Michael</div><div class="guest-role">Birthday legend</div></div>
+      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--accent),var(--gold));">SB</div><div class="guest-name">Sheetal</div><div class="guest-role">Wife</div></div>
+      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--green),var(--blue));">LZ</div><div class="guest-name">Leo</div><div class="guest-role">Chief explorer (age 3)</div></div>
+      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--blue),var(--purple));">BZ</div><div class="guest-name">Basil</div><div class="guest-role">Brother</div></div>
+      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--pink),var(--accent));">PZ</div><div class="guest-name">Penelope</div><div class="guest-role">Sister</div></div>
+      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--purple),var(--gold));">AK</div><div class="guest-name">Aleco</div><div class="guest-role">Cousin</div></div>
+      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--blue),var(--green));">WS</div><div class="guest-name">Wayne</div><div class="guest-role">Friend</div></div>
+      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--pink),var(--purple));">H</div><div class="guest-name">Harriet</div><div class="guest-role">Friend</div></div>
     </div>
 
     <div class="section-label">The Villa</div>
@@ -267,9 +324,8 @@
 
   <!-- ========== VOTE ========== -->
   <div class="tab-content" id="tab-vote">
-    <p style="color:var(--text-muted);margin-bottom:8px;font-size:0.9rem;">Pick your name, then vote for activities you'd like to do. One vote per person per activity.</p>
-    <div class="current-user-label">Voting as:</div>
-    <div class="name-picker" id="vote-name-picker"></div>
+    <p style="color:var(--text-muted);margin-bottom:8px;font-size:0.9rem;">Vote for activities you'd like to do. One vote per person per activity.</p>
+    <div class="current-user-label">Voting as: <strong id="vote-as-label" style="color:var(--gold);"></strong></div>
     <div class="section-label" style="margin-top:8px;">Activities</div>
     <div id="vote-list"></div>
     <div class="section-label" style="margin-top:24px;">Suggest an activity</div>
@@ -281,9 +337,8 @@
 
   <!-- ========== WHO'S BRINGING WHAT ========== -->
   <div class="tab-content" id="tab-bring">
-    <p style="color:var(--text-muted);margin-bottom:8px;font-size:0.9rem;">Claim items so we don't end up with five baguettes and no wine. Pick your name, then claim what you're bringing.</p>
-    <div class="current-user-label">You are:</div>
-    <div class="name-picker" id="bring-name-picker"></div>
+    <p style="color:var(--text-muted);margin-bottom:8px;font-size:0.9rem;">Claim items so we don't end up with five baguettes and no wine.</p>
+    <div class="current-user-label">You are: <strong id="bring-as-label" style="color:var(--gold);"></strong></div>
     <div id="bring-list"></div>
 
     <div class="card" style="margin-top:16px;">
@@ -325,9 +380,7 @@
     <div class="message-form">
       <textarea class="message-textarea" id="msg-text" placeholder="Share a memory, inside joke, or reason MZ is great..."></textarea>
       <div class="message-form-row">
-        <select class="text-input" id="msg-from" style="flex:0 0 auto;width:auto;padding:10px 16px;">
-          <option value="">Your name...</option>
-        </select>
+        <span id="msg-from-display" style="font-size:0.85rem;color:var(--text-muted);padding:10px 0;">Posting as: <strong style="color:var(--gold);" id="msg-from-label"></strong></span>
         <button class="btn-gold" onclick="addMessage()">Post Message</button>
       </div>
     </div>
@@ -388,9 +441,12 @@
 
 </div>
 
+</div><!-- end #app-content -->
+
 <!-- Firebase SDK (compat mode for single-file simplicity) -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 
 <script>
 // ╔══════════════════════════════════════════════════════════════════╗
@@ -416,9 +472,25 @@ const firebaseConfig = {
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const dbRef = db.ref('mz40');
+const auth = firebase.auth();
+
+// ===== AUTH CONFIG =====
+// Map each guest's email to their display name. Update these with real emails before deploying.
+const EMAIL_TO_GUEST = {
+  'michael@example.com': 'Michael',
+  'sheetal@example.com': 'Sheetal',
+  'basil@example.com': 'Basil',
+  'penelope@example.com': 'Penelope',
+  'aleco@example.com': 'Aleco',
+  'wayne@example.com': 'Wayne',
+  'harriet@example.com': 'Harriet'
+};
+const INVITE_CODE = 'mezy2026'; // Share this privately with guests
+let currentGuest = null;
+let authMode = 'login'; // 'login' or 'signup'
 
 // ===== STATE =====
-const GUESTS = ['MZ','Wife','Brother','Sister','Cousin'];
+const GUESTS = ['Michael','Sheetal','Basil','Penelope','Aleco','Wayne','Harriet'];
 let state = {};
 let firebaseReady = false;
 
@@ -434,9 +506,8 @@ function defaultState(){
 }
 
 function loadState(){
-  // Load voter preference from localStorage (personal, not shared)
   state = defaultState();
-  state.voter = localStorage.getItem('mz40-voter') || '';
+  state.voter = currentGuest || '';
   state.packed = JSON.parse(localStorage.getItem('mz40-packed') || '{}');
 
   // Listen for real-time updates from Firebase
@@ -458,8 +529,6 @@ function loadState(){
 }
 
 function saveState(){
-  // Save personal prefs locally
-  localStorage.setItem('mz40-voter', state.voter);
   localStorage.setItem('mz40-packed', JSON.stringify(state.packed));
 
   // Save shared data to Firebase
@@ -505,14 +574,8 @@ function defaultActivities(){return[
   {id:'picnic',name:'French picnic by the Seine',desc:'Bread, cheese, charcuterie, wine — al fresco.',drive:'0 min',voters:[]},
   {id:'petanque',name:'Pétanque tournament',desc:'Court on the property. Round-robin with prizes?',drive:'At villa',voters:[]},
 ];}
-function renderNamePicker(containerId){
-  document.getElementById(containerId).innerHTML=GUESTS.map(g=>
-    `<button class="name-chip ${state.voter===g?'active':''}" onclick="setVoter('${g}')">${g}</button>`
-  ).join('');
-}
-function setVoter(name){state.voter=name;renderAll();saveState();}
 function toggleVote(id){
-  if(!state.voter)return alert('Pick your name first!');
+  if(!currentGuest)return;
   const act=state.activities.find(a=>a.id===id);if(!act)return;
   const i=act.voters.indexOf(state.voter);
   if(i>-1)act.voters.splice(i,1);else act.voters.push(state.voter);
@@ -528,7 +591,7 @@ function renderVotes(){
 }
 function suggestActivity(){
   const inp=document.getElementById('suggest-input');const name=inp.value.trim();if(!name)return;
-  state.activities.push({id:'c-'+Date.now(),name,desc:'Suggested by '+(state.voter||'someone'),drive:'TBD',voters:[]});
+  state.activities.push({id:'c-'+Date.now(),name,desc:'Suggested by '+(currentGuest||'someone'),drive:'TBD',voters:[]});
   inp.value='';renderVotes();saveState();
 }
 
@@ -590,19 +653,19 @@ function renderBringList(){
   document.getElementById('bring-list').innerHTML=html;
 }
 function claimItem(id){
-  if(!state.voter)return alert('Pick your name first!');
+  if(!currentGuest)return;
   const item=state.bringItems.find(i=>i.id===id);if(item)item.claimedBy=state.voter;
   renderBringList();saveState();
 }
 function unclaimItem(id){
-  const item=state.bringItems.find(i=>i.id===id);if(item)item.claimedBy='';
+  const item=state.bringItems.find(i=>i.id===id);if(item&&item.claimedBy===currentGuest)item.claimedBy='';
   renderBringList();saveState();
 }
 function addBringItem(){
   const name=document.getElementById('add-bring-name').value.trim();
   const cat=document.getElementById('add-bring-cat').value;
   if(!name)return;
-  state.bringItems.push({id:'bi-'+Date.now(),cat,name,note:'Added by '+(state.voter||'someone'),claimedBy:''});
+  state.bringItems.push({id:'bi-'+Date.now(),cat,name,note:'Added by '+(currentGuest||'someone'),claimedBy:''});
   document.getElementById('add-bring-name').value='';
   renderBringList();saveState();
 }
@@ -611,10 +674,14 @@ function addBringItem(){
 function renderDietary(){
   document.getElementById('dietary-grid').innerHTML=GUESTS.map(g=>{
     const diet=state.dietary[g]||'';
-    return`<div class="dietary-card" onclick="editDietary('${g}')"><div class="name">${g}</div><div class="diet ${diet?'':'empty'}">${diet||'Click to add'}</div></div>`;
+    const isMe=g===currentGuest;
+    const hint=isMe?(diet||'Click to add'):(diet||'None set');
+    const style=isMe?'cursor:pointer;border:1px solid rgba(201,168,76,0.3);':'cursor:default;';
+    return`<div class="dietary-card" style="${style}" onclick="editDietary('${g}')"><div class="name">${g}${isMe?' (you)':''}</div><div class="diet ${hint===diet?'':'empty'}">${hint}</div></div>`;
   }).join('');
 }
 function editDietary(guest){
+  if(guest!==currentGuest)return;
   const current=state.dietary[guest]||'';
   const val=prompt(`Dietary requirements for ${guest}:`,current);
   if(val!==null){state.dietary[guest]=val;renderDietary();saveState();}
@@ -631,16 +698,13 @@ function renderMessages(){
   }).join('');
   document.getElementById('msg-count').textContent=state.messages.length+'/40';
   document.getElementById('msg-bar').style.width=(state.messages.length/40*100)+'%';
-  // populate the from dropdown
-  const sel=document.getElementById('msg-from');
-  sel.innerHTML='<option value="">Your name...</option>'+GUESTS.map(g=>`<option value="${g}">${g}</option>`).join('');
+  if(currentGuest) document.getElementById('msg-from-label').textContent=currentGuest;
 }
 function addMessage(){
   const text=document.getElementById('msg-text').value.trim();
-  const from=document.getElementById('msg-from').value;
   if(!text)return alert('Write a message first!');
-  if(!from)return alert('Pick your name!');
-  state.messages.push({text,from,ts:Date.now()});
+  if(!currentGuest)return;
+  state.messages.push({text,from:currentGuest,ts:Date.now()});
   document.getElementById('msg-text').value='';
   renderMessages();saveState();
 }
@@ -692,8 +756,10 @@ function renderConnectionStatus(){
 
 // ===== RENDER ALL =====
 function renderAll(){
-  renderNamePicker('vote-name-picker');
-  renderNamePicker('bring-name-picker');
+  if(currentGuest){
+    document.getElementById('vote-as-label').textContent=currentGuest;
+    document.getElementById('bring-as-label').textContent=currentGuest;
+  }
   renderVotes();
   renderBringList();
   renderDietary();
@@ -702,9 +768,81 @@ function renderAll(){
   renderConnectionStatus();
 }
 
-// ===== INIT =====
-loadState();
-renderAll();
+// ===== AUTH FUNCTIONS =====
+function doAuth(){
+  const email=document.getElementById('login-email').value.trim();
+  const password=document.getElementById('login-password').value;
+  clearLoginError();
+  if(!email||!password)return showLoginError('Enter email and password.');
+  document.getElementById('login-btn').disabled=true;
+
+  if(authMode==='signup'){
+    const code=document.getElementById('invite-code').value.trim();
+    if(code!==INVITE_CODE){document.getElementById('login-btn').disabled=false;return showLoginError('Invalid invite code.');}
+    if(!EMAIL_TO_GUEST[email.toLowerCase()]){document.getElementById('login-btn').disabled=false;return showLoginError('This email is not on the guest list.');}
+    auth.createUserWithEmailAndPassword(email,password)
+      .catch(err=>{document.getElementById('login-btn').disabled=false;showLoginError(friendlyError(err.code));});
+  } else {
+    auth.signInWithEmailAndPassword(email,password)
+      .catch(err=>{document.getElementById('login-btn').disabled=false;showLoginError(friendlyError(err.code));});
+  }
+}
+
+function doSignOut(){auth.signOut();}
+
+function toggleAuthMode(){
+  authMode=authMode==='login'?'signup':'login';
+  document.getElementById('login-btn').textContent=authMode==='signup'?'Sign Up':'Sign In';
+  document.getElementById('login-toggle').textContent=authMode==='signup'?'Already have an account? Sign in':'Need an account? Sign up';
+  document.getElementById('invite-field').classList.toggle('show',authMode==='signup');
+  document.getElementById('login-password').autocomplete=authMode==='signup'?'new-password':'current-password';
+  clearLoginError();
+}
+
+function showLoginError(msg){document.getElementById('login-error').textContent=msg;}
+function clearLoginError(){document.getElementById('login-error').textContent='';}
+function friendlyError(code){
+  const map={
+    'auth/wrong-password':'Incorrect password.',
+    'auth/invalid-credential':'Incorrect email or password.',
+    'auth/user-not-found':'No account with that email. Sign up first.',
+    'auth/email-already-in-use':'Account already exists. Try signing in.',
+    'auth/weak-password':'Password must be at least 6 characters.',
+    'auth/invalid-email':'Invalid email address.',
+    'auth/too-many-requests':'Too many attempts. Try again later.'
+  };
+  return map[code]||'Something went wrong. Try again.';
+}
+
+// Enter key triggers login
+document.getElementById('login-email').addEventListener('keydown',e=>{if(e.key==='Enter')doAuth();});
+document.getElementById('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')doAuth();});
+document.getElementById('invite-code').addEventListener('keydown',e=>{if(e.key==='Enter')doAuth();});
+
+// ===== INIT — Auth State Observer =====
+auth.onAuthStateChanged((user)=>{
+  if(user){
+    const guestName=EMAIL_TO_GUEST[user.email.toLowerCase()];
+    if(!guestName){
+      auth.signOut();
+      showLoginError('This email is not on the guest list.');
+      return;
+    }
+    currentGuest=guestName;
+    state.voter=guestName;
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app-content').classList.remove('hidden');
+    document.getElementById('hero-guest-name').textContent=guestName;
+    loadState();
+    renderAll();
+  } else {
+    currentGuest=null;
+    document.getElementById('login-screen').classList.remove('hidden');
+    document.getElementById('app-content').classList.add('hidden');
+    document.getElementById('login-btn').disabled=false;
+    clearLoginError();
+  }
+});
 </script>
 </body>
 </html>
