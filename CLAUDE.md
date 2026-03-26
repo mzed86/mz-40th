@@ -8,7 +8,7 @@ A single-page collaborative website for planning MZ's 40th birthday trip: a long
 
 - **Single HTML file** (`dashboard.html`) — all HTML, CSS, and JavaScript in one file
 - No build tools, frameworks, or bundlers
-- Client-side only with `localStorage` for persistence (no backend)
+- **Firebase** for backend persistence (Firestore for shared state, synced across all users in real-time)
 - Hosted as a static site (GitHub Pages or similar)
 
 ## Architecture
@@ -23,7 +23,7 @@ The site is organized as a tabbed dashboard with these sections:
 - **Travel Info** — driving directions, villa address, key reminders, weather
 - **Packing** — checklist with checkable items
 
-All interactive state (votes, claims, messages, checklist) is stored in `localStorage` using a name-picker pattern — users select their name before interacting.
+All interactive state (votes, claims, messages, checklist) is persisted in Firebase and synced in real-time across users. Users select their name via a name-picker pattern before interacting.
 
 ## Key Details
 
@@ -39,4 +39,4 @@ All interactive state (votes, claims, messages, checklist) is stored in `localSt
 - Mobile-responsive — test at 600px breakpoint
 - Use the existing name-picker pattern for any new interactive features
 - Tags for itinerary items: `tag-all` (Everyone), `tag-adults` (Adults), `tag-kid` (Kid-friendly)
-- No external JS dependencies — vanilla JavaScript only
+- No external JS dependencies beyond Firebase — vanilla JavaScript otherwise
