@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MZ's 40th — Mézy-sur-Seine Weekend</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap');
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  :root{
+    --gold:#c9a84c;--gold-light:#f5e6b8;--dark:#1a1a2e;--dark-card:#16213e;
+    --dark-surface:#1e2a47;--accent:#e94560;--text:#eee;--text-muted:#a0a8c0;
+    --green:#4ade80;--blue:#60a5fa;--purple:#a78bfa;--pink:#f472b6;
+  }
+
+  body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);padding:60px 24px 40px;text-align:center;position:relative;overflow:hidden;}
+  .hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 40%,rgba(201,168,76,0.08) 0%,transparent 50%),radial-gradient(circle at 70% 60%,rgba(233,69,96,0.05) 0%,transparent 50%);animation:shimmer 20s ease-in-out infinite;}
+  @keyframes shimmer{0%,100%{transform:translate(0,0);}50%{transform:translate(-5%,5%);}}
+  .hero h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);color:var(--gold);position:relative;z-index:1;}
+  .hero .subtitle{font-size:1.1rem;color:var(--text-muted);margin-top:8px;position:relative;z-index:1;}
+  .hero .dates-badge{display:inline-block;margin-top:16px;padding:8px 24px;background:rgba(201,168,76,0.15);border:1px solid var(--gold);border-radius:30px;color:var(--gold);font-weight:500;position:relative;z-index:1;}
+
+  /* ===== COUNTDOWN ===== */
+  .countdown-bar{display:flex;justify-content:center;gap:24px;padding:24px;background:var(--dark-card);border-bottom:1px solid rgba(201,168,76,0.2);}
+  .countdown-unit{text-align:center;}
+  .countdown-unit .num{font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold);font-weight:700;}
+  .countdown-unit .label{font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);}
+
+  /* ===== LAYOUT ===== */
+  .container{max-width:1100px;margin:0 auto;padding:24px;}
+
+  /* ===== NAV ===== */
+  .nav-tabs{display:flex;gap:4px;background:var(--dark-card);padding:6px;border-radius:12px;margin-bottom:24px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .nav-tab{flex:1;padding:12px 10px;border:none;background:transparent;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;border-radius:8px;cursor:pointer;transition:all 0.2s;white-space:nowrap;min-width:0;}
+  .nav-tab:hover{color:var(--text);background:var(--dark-surface);}
+  .nav-tab.active{color:var(--gold);background:var(--dark-surface);}
+
+  .tab-content{display:none;}.tab-content.active{display:block;}
+
+  /* ===== CARDS ===== */
+  .card{background:var(--dark-card);border-radius:12px;padding:24px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.05);}
+  .card h3{font-family:'Playfair Display',serif;color:var(--gold);font-size:1.2rem;margin-bottom:12px;}
+  .card p{color:var(--text-muted);line-height:1.6;}
+  .section-label{font-size:0.8rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:16px;}
+
+  /* ===== INFO GRID ===== */
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+  .info-item{display:flex;gap:12px;align-items:flex-start;}
+  .info-icon{width:40px;height:40px;border-radius:10px;background:rgba(201,168,76,0.1);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+  .info-label{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;}
+  .info-value{font-weight:500;margin-top:2px;}
+
+  /* ===== GUEST GRID ===== */
+  .guest-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;}
+  .guest-card{background:var(--dark-surface);border-radius:10px;padding:16px;text-align:center;}
+  .guest-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-weight:700;font-size:1.1rem;color:var(--dark);}
+  .guest-name{font-weight:600;font-size:0.95rem;}
+  .guest-role{font-size:0.75rem;color:var(--text-muted);margin-top:2px;}
+
+  /* ===== ITINERARY ===== */
+  .day-header{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--gold);margin:24px 0 12px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.2);}
+  .day-header:first-child{margin-top:0;}
+  .timeline-item{display:flex;gap:16px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.03);}
+  .timeline-time{min-width:65px;font-weight:600;color:var(--gold);font-size:0.9rem;}
+  .timeline-body h4{font-size:0.95rem;margin-bottom:4px;}
+  .timeline-body p{font-size:0.85rem;color:var(--text-muted);}
+  .tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-top:6px;margin-right:4px;}
+  .tag-all{background:rgba(201,168,76,0.15);color:var(--gold);}
+  .tag-adults{background:rgba(96,165,250,0.15);color:var(--blue);}
+  .tag-kid{background:rgba(74,222,128,0.15);color:var(--green);}
+
+  /* ===== VOTE ===== */
+  .name-picker{display:flex;gap:8px;padding:12px 0;flex-wrap:wrap;}
+  .name-chip{padding:8px 16px;border-radius:20px;font-size:0.85rem;font-weight:500;cursor:pointer;border:1px solid rgba(201,168,76,0.3);background:transparent;color:var(--text-muted);transition:all 0.2s;font-family:'Inter',sans-serif;}
+  .name-chip:hover{border-color:var(--gold);color:var(--text);}
+  .name-chip.active{background:var(--gold);color:var(--dark);border-color:var(--gold);font-weight:600;}
+  .current-user-label{font-size:0.8rem;color:var(--text-muted);}
+  .vote-card{background:var(--dark-card);border-radius:12px;padding:20px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.05);transition:border-color 0.2s;}
+  .vote-card:hover{border-color:rgba(201,168,76,0.3);}
+  .vote-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+  .vote-header h4{font-size:1rem;}
+  .vote-header .drive-time{font-size:0.8rem;color:var(--text-muted);white-space:nowrap;}
+  .vote-desc{color:var(--text-muted);font-size:0.85rem;margin:8px 0 12px;line-height:1.5;}
+  .vote-bar-container{display:flex;align-items:center;gap:12px;}
+  .vote-bar-bg{flex:1;height:8px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden;}
+  .vote-bar-fill{height:100%;border-radius:4px;transition:width 0.4s ease;background:linear-gradient(90deg,var(--gold),var(--accent));}
+  .vote-count{font-size:0.85rem;color:var(--gold);font-weight:600;min-width:40px;text-align:right;}
+  .vote-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center;}
+  .vote-btn{padding:6px 16px;border-radius:20px;font-size:0.8rem;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.2s;border:1px solid rgba(201,168,76,0.3);background:transparent;color:var(--gold);}
+  .vote-btn:hover{background:rgba(201,168,76,0.15);}
+  .vote-btn.voted{background:var(--gold);color:var(--dark);border-color:var(--gold);}
+  .suggest-form{display:flex;gap:8px;margin-top:16px;}
+  .suggest-input,.text-input{flex:1;padding:10px 16px;border-radius:8px;border:1px solid rgba(201,168,76,0.3);background:var(--dark-surface);color:var(--text);font-family:'Inter',sans-serif;font-size:0.9rem;}
+  .suggest-input::placeholder,.text-input::placeholder{color:var(--text-muted);}
+  .suggest-input:focus,.text-input:focus{outline:none;border-color:var(--gold);}
+  .suggest-submit,.btn-gold{padding:10px 20px;border-radius:8px;border:none;background:var(--gold);color:var(--dark);font-family:'Inter',sans-serif;font-weight:600;cursor:pointer;white-space:nowrap;font-size:0.9rem;}
+  .suggest-submit:hover,.btn-gold:hover{opacity:0.9;}
+
+  /* ===== BRING LIST ===== */
+  .bring-category{margin-bottom:24px;}
+  .bring-category-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  .bring-category-header h4{color:var(--gold);font-family:'Playfair Display',serif;font-size:1.1rem;}
+  .bring-item{background:var(--dark-surface);border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+  .bring-item-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0;}
+  .bring-item-name{font-weight:500;}
+  .bring-item-note{font-size:0.8rem;color:var(--text-muted);}
+  .bring-item-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .claimed-badge{padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;}
+  .claimed-badge.unclaimed{background:rgba(233,69,96,0.15);color:var(--accent);border:1px solid rgba(233,69,96,0.3);}
+  .claimed-badge.claimed{background:rgba(74,222,128,0.15);color:var(--green);border:1px solid rgba(74,222,128,0.3);}
+  .claim-btn{padding:6px 14px;border-radius:20px;font-size:0.78rem;font-weight:500;cursor:pointer;border:1px solid rgba(201,168,76,0.3);background:transparent;color:var(--gold);font-family:'Inter',sans-serif;transition:all 0.2s;}
+  .claim-btn:hover{background:rgba(201,168,76,0.15);}
+  .claim-btn.mine{background:var(--green);color:var(--dark);border-color:var(--green);}
+
+  .add-item-row{display:flex;gap:8px;margin-top:8px;}
+  .add-item-row input{flex:1;}
+  .add-item-row select{padding:10px 12px;border-radius:8px;border:1px solid rgba(201,168,76,0.3);background:var(--dark-surface);color:var(--text);font-family:'Inter',sans-serif;font-size:0.85rem;}
+
+  /* ===== MESSAGE WALL ===== */
+  .message-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+  .message-card{background:var(--dark-surface);border-radius:12px;padding:20px;border-left:3px solid var(--gold);position:relative;}
+  .message-card .msg-text{font-size:0.95rem;line-height:1.6;color:var(--text);font-style:italic;margin-bottom:12px;}
+  .message-card .msg-from{font-size:0.8rem;color:var(--gold);font-weight:600;}
+  .message-form{margin-top:20px;}
+  .message-textarea{width:100%;padding:14px;border-radius:10px;border:1px solid rgba(201,168,76,0.3);background:var(--dark-surface);color:var(--text);font-family:'Inter',sans-serif;font-size:0.9rem;min-height:80px;resize:vertical;}
+  .message-textarea::placeholder{color:var(--text-muted);}
+  .message-textarea:focus{outline:none;border-color:var(--gold);}
+  .message-form-row{display:flex;gap:8px;margin-top:8px;}
+
+  /* ===== TRAVEL INFO ===== */
+  .travel-step{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+  .travel-step:last-child{border-bottom:none;}
+  .travel-step-icon{width:36px;height:36px;border-radius:50%;background:rgba(201,168,76,0.15);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+  .travel-step-body h4{font-size:0.95rem;margin-bottom:4px;}
+  .travel-step-body p{font-size:0.85rem;color:var(--text-muted);line-height:1.5;}
+
+  /* ===== PACKING ===== */
+  .checklist-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.03);cursor:pointer;user-select:none;}
+  .checklist-box{width:22px;height:22px;border-radius:6px;border:2px solid rgba(201,168,76,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;}
+  .checklist-item.checked .checklist-box{background:var(--gold);border-color:var(--gold);}
+  .checklist-item.checked .checklist-box::after{content:'✓';color:var(--dark);font-size:0.8rem;font-weight:700;}
+  .checklist-item.checked .checklist-text{text-decoration:line-through;color:var(--text-muted);}
+
+  /* ===== DIETARY ===== */
+  .dietary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:12px;}
+  .dietary-card{background:var(--dark-surface);border-radius:10px;padding:14px;text-align:center;}
+  .dietary-card .name{font-weight:600;margin-bottom:4px;}
+  .dietary-card .diet{font-size:0.85rem;color:var(--text-muted);min-height:20px;}
+  .dietary-card .diet.empty{font-style:italic;color:rgba(160,168,192,0.5);}
+
+  /* ===== RESPONSIVE ===== */
+  @media(max-width:600px){
+    .hero{padding:40px 16px 24px;}
+    .countdown-bar{gap:16px;padding:16px;}
+    .countdown-unit .num{font-size:1.5rem;}
+    .container{padding:16px;}
+    .nav-tabs{gap:2px;padding:4px;}
+    .nav-tab{padding:10px 8px;font-size:0.75rem;}
+    .vote-header{flex-direction:column;}
+    .bring-item{flex-direction:column;align-items:flex-start;}
+    .bring-item-right{width:100%;justify-content:flex-end;}
+    .message-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>MZ's 40th Birthday</h1>
+  <div class="subtitle">A long weekend at a villa in Mézy-sur-Seine, France</div>
+  <div class="dates-badge">Fri 1 May – Mon 4 May 2026</div>
+</div>
+
+<!-- COUNTDOWN -->
+<div class="countdown-bar" id="countdown">
+  <div class="countdown-unit"><div class="num" id="cd-days">--</div><div class="label">Days</div></div>
+  <div class="countdown-unit"><div class="num" id="cd-hours">--</div><div class="label">Hours</div></div>
+  <div class="countdown-unit"><div class="num" id="cd-mins">--</div><div class="label">Mins</div></div>
+  <div class="countdown-unit"><div class="num" id="cd-secs">--</div><div class="label">Secs</div></div>
+</div>
+
+<div class="container">
+
+  <!-- NAV -->
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-tab="overview">Overview</button>
+    <button class="nav-tab" data-tab="itinerary">Itinerary</button>
+    <button class="nav-tab" data-tab="vote">Vote</button>
+    <button class="nav-tab" data-tab="bring">Who's Bringing What</button>
+    <button class="nav-tab" data-tab="wall">Message Wall</button>
+    <button class="nav-tab" data-tab="travel">Travel Info</button>
+    <button class="nav-tab" data-tab="packing">Packing</button>
+  </div>
+
+  <!-- ========== OVERVIEW ========== -->
+  <div class="tab-content active" id="tab-overview">
+    <div class="section-label">The Crew</div>
+    <div class="guest-grid" style="margin-bottom:24px;">
+      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--gold),var(--accent));">MZ</div><div class="guest-name">MZ</div><div class="guest-role">Birthday legend</div></div>
+      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--accent),var(--gold));">W</div><div class="guest-name">Wife</div><div class="guest-role">Partner</div></div>
+      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--green),var(--blue));">S</div><div class="guest-name">Son</div><div class="guest-role">Chief explorer (age 3)</div></div>
+      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--blue),var(--purple));">B</div><div class="guest-name">Brother</div><div class="guest-role">Sibling</div></div>
+      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--pink),var(--accent));">S</div><div class="guest-name">Sister</div><div class="guest-role">Sibling</div></div>
+      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--purple),var(--gold));">C</div><div class="guest-name">Cousin</div><div class="guest-role">Family</div></div>
+    </div>
+
+    <div class="section-label">The Villa</div>
+    <div class="card">
+      <h3>Exceptional Villa — Mézy-sur-Seine</h3>
+      <div class="info-grid" style="margin-top:12px;">
+        <div class="info-item"><div class="info-icon">🏠</div><div><div class="info-label">Accommodation</div><div class="info-value">4 bedrooms · 4 bathrooms · sleeps 8</div></div></div>
+        <div class="info-item"><div class="info-icon">📍</div><div><div class="info-label">Location</div><div class="info-value">Mézy-sur-Seine, Yvelines</div></div></div>
+        <div class="info-item"><div class="info-icon">🚗</div><div><div class="info-label">Drive from Calais</div><div class="info-value">~3h 12min (292km via A16)</div></div></div>
+        <div class="info-item"><div class="info-icon">🕐</div><div><div class="info-label">Check-in / out</div><div class="info-value">In from 16:00 · Out by 10:00</div></div></div>
+        <div class="info-item"><div class="info-icon">🏊</div><div><div class="info-label">Amenities</div><div class="info-value">Heated pool · pétanque · summer kitchen · swing · A/C</div></div></div>
+        <div class="info-item"><div class="info-icon">⚠️</div><div><div class="info-label">House Rules</div><div class="info-value">Sound detector · exterior cameras · no parties · pool cover on when not in use</div></div></div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:24px;">Nearby Highlights</div>
+    <div class="info-grid">
+      <div class="card" style="margin-bottom:0;"><h3>🎨 Monet's Garden, Giverny</h3><p>~40 min. Open Apr–Nov. Book tickets in advance — early May is peak.</p></div>
+      <div class="card" style="margin-bottom:0;"><h3>🏰 Versailles</h3><p>~35 min. Palace, gardens, Grand Trianon.</p></div>
+      <div class="card" style="margin-bottom:0;"><h3>🗼 Paris</h3><p>~45 min. Eiffel Tower, Montmartre, Seine cruises, Luxembourg Gardens.</p></div>
+      <div class="card" style="margin-bottom:0;"><h3>🌳 Vexin Natural Park</h3><p>On the doorstep. Hiking, cycling, countryside walks.</p></div>
+      <div class="card" style="margin-bottom:0;"><h3>🦁 Thoiry Zoo</h3><p>~40 min. Safari park — brilliant for a 3-year-old.</p></div>
+      <div class="card" style="margin-bottom:0;"><h3>🎵 Spotify Playlist</h3><p>Add your songs for the villa weekend! <a href="#" style="color:var(--gold);">Open collaborative playlist →</a></p></div>
+    </div>
+  </div>
+
+  <!-- ========== ITINERARY ========== -->
+  <div class="tab-content" id="tab-itinerary">
+    <p style="color:var(--text-muted);margin-bottom:16px;font-size:0.9rem;">Draft itinerary — times are flexible. Vote on activities in the Vote tab to help shape the plan.</p>
+
+    <div class="day-header">Friday 1 May — Travel Day</div>
+    <div class="timeline-item"><div class="timeline-time">07:00</div><div class="timeline-body"><h4>Le Shuttle from Folkestone</h4><p>Meet at Eurotunnel terminal. ~35 min crossing to Calais.</p><span class="tag tag-all">Everyone</span></div></div>
+    <div class="timeline-item"><div class="timeline-time">11:00</div><div class="timeline-body"><h4>Lunch stop en route</h4><p>Break near Amiens or Beauvais — stretch legs, nap for the little one.</p><span class="tag tag-kid">Kid stop</span></div></div>
+    <div class="timeline-item"><div class="timeline-time">16:00</div><div class="timeline-body"><h4>Arrive at villa — check in</h4><p>Explore the grounds, test the pool, fire up the pétanque court.</p><span class="tag tag-all">Everyone</span></div></div>
+    <div class="timeline-item"><div class="timeline-time">19:30</div><div class="timeline-body"><h4>Welcome dinner at the villa</h4><p>Summer kitchen BBQ or cook together. First toast of the weekend!</p><span class="tag tag-all">Everyone</span></div></div>
+
+    <div class="day-header">Saturday 2 May — Day Trip Day</div>
+    <div class="timeline-item"><div class="timeline-time">09:00</div><div class="timeline-body"><h4>Breakfast</h4><p>Croissants, coffee, pastries from a local boulangerie.</p><span class="tag tag-all">Everyone</span></div></div>
+    <div class="timeline-item"><div class="timeline-time">10:00</div><div class="timeline-body"><h4>Monet's Garden, Giverny</h4><p>~40 min drive. Water gardens, Japanese bridge, flower gardens.</p><span class="tag tag-all">Everyone</span><span class="tag tag-kid">Toddler-friendly</span></div></div>
+    <div class="timeline-item"><div class="timeline-time">12:30</div><div class="timeline-body"><h4>Lunch in Giverny or Vernon</h4><p>Restaurants and cafés in the village. Moulin de Fourges is lovely nearby.</p><span class="tag tag-all">Everyone</span></div></div>
+    <div class="timeline-item"><div class="timeline-time">15:00</div><div class="timeline-body"><h4>Afternoon at the villa</h4><p>Pool, orchard, nap time, pétanque tournament.</p><span class="tag tag-all">Everyone</span></div></div>
+    <div class="timeline-item"><div class="timeline-time">20:00</div><div class="timeline-body"><h4>MZ's Birthday Dinner 🎂</h4><p>The big one. Restaurant or catered at the villa — TBD!</p><span class="tag tag-all">Everyone</span></div></div>
+
+    <div class="day-header">Sunday 3 May — Explore or Relax</div>
+    <div class="timeline-item"><div class="timeline-time">09:30</div><div class="timeline-body"><h4>Lazy breakfast</h4><p>No rush. Coffee on the terrace.</p><span class="tag tag-all">Everyone</span></div></div>
+    <div class="timeline-item"><div class="timeline-time">10:30</div><div class="timeline-body"><h4>Option A: Versailles</h4><p>~35 min drive. Palace, gardens, Hall of Mirrors. Book tickets ahead.</p><span class="tag tag-adults">Adults</span></div></div>
+    <div class="timeline-item"><div class="timeline-time">10:30</div><div class="timeline-body"><h4>Option B: Seine walk + village morning</h4><p>Gentle walk along the river. Perfect for a 3-year-old.</p><span class="tag tag-kid">Kid-friendly</span></div></div>
+    <div class="timeline-item"><div class="timeline-time">13:00</div><div class="timeline-body"><h4>Picnic by the Seine</h4><p>Bread, cheese, charcuterie, wine — proper French picnic.</p><span class="tag tag-all">Everyone</span></div></div>
+    <div class="timeline-item"><div class="timeline-time">15:00</div><div class="timeline-body"><h4>Pool, pétanque, garden games</h4><p>Relaxed afternoon.</p><span class="tag tag-all">Everyone</span></div></div>
+    <div class="timeline-item"><div class="timeline-time">19:00</div><div class="timeline-body"><h4>Final evening dinner</h4><p>Cook a feast in the summer kitchen, or find a local restaurant.</p><span class="tag tag-all">Everyone</span></div></div>
+
+    <div class="day-header">Monday 4 May — Departure</div>
+    <div class="timeline-item"><div class="timeline-time">08:00</div><div class="timeline-body"><h4>Breakfast & pack up</h4><p>Final croissants. Check-out by 10:00.</p><span class="tag tag-all">Everyone</span></div></div>
+    <div class="timeline-item"><div class="timeline-time">10:00</div><div class="timeline-body"><h4>Depart for Calais</h4><p>~3h 12min drive. Factor in a lunch/nap stop.</p><span class="tag tag-all">Everyone</span></div></div>
+    <div class="timeline-item"><div class="timeline-time">14:30</div><div class="timeline-body"><h4>Le Shuttle back to Folkestone</h4><p>Home by late afternoon / early evening.</p><span class="tag tag-all">Everyone</span></div></div>
+  </div>
+
+  <!-- ========== VOTE ========== -->
+  <div class="tab-content" id="tab-vote">
+    <p style="color:var(--text-muted);margin-bottom:8px;font-size:0.9rem;">Pick your name, then vote for activities you'd like to do. One vote per person per activity.</p>
+    <div class="current-user-label">Voting as:</div>
+    <div class="name-picker" id="vote-name-picker"></div>
+    <div class="section-label" style="margin-top:8px;">Activities</div>
+    <div id="vote-list"></div>
+    <div class="section-label" style="margin-top:24px;">Suggest an activity</div>
+    <div class="suggest-form">
+      <input type="text" class="suggest-input" id="suggest-input" placeholder="e.g. Wine tasting at a local vineyard...">
+      <button class="suggest-submit" onclick="suggestActivity()">Add</button>
+    </div>
+  </div>
+
+  <!-- ========== WHO'S BRINGING WHAT ========== -->
+  <div class="tab-content" id="tab-bring">
+    <p style="color:var(--text-muted);margin-bottom:8px;font-size:0.9rem;">Claim items so we don't end up with five baguettes and no wine. Pick your name, then claim what you're bringing.</p>
+    <div class="current-user-label">You are:</div>
+    <div class="name-picker" id="bring-name-picker"></div>
+    <div id="bring-list"></div>
+
+    <div class="card" style="margin-top:16px;">
+      <h3>Add an Item</h3>
+      <div class="add-item-row">
+        <input type="text" class="text-input" id="add-bring-name" placeholder="Item name (e.g. Bottle of champagne)">
+        <select id="add-bring-cat">
+          <option value="bbq">BBQ & Cooking</option>
+          <option value="drinks">Drinks</option>
+          <option value="breakfast">Breakfast</option>
+          <option value="birthday">Birthday Bits</option>
+          <option value="gear">Gear & Equipment</option>
+          <option value="other">Other</option>
+        </select>
+        <button class="btn-gold" onclick="addBringItem()">Add</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h3>Dietary Requirements</h3>
+      <p>Let everyone know your dietary needs — click your card to update.</p>
+      <div class="dietary-grid" id="dietary-grid"></div>
+    </div>
+  </div>
+
+  <!-- ========== MESSAGE WALL ========== -->
+  <div class="tab-content" id="tab-wall">
+    <p style="color:var(--text-muted);margin-bottom:16px;font-size:0.9rem;">Leave a message, memory, or reason MZ is brilliant. Building towards 40 messages for 40 years!</p>
+    <div class="card" style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h3 style="margin-bottom:0;">40 Messages for 40 Years</h3>
+        <div style="font-size:1.5rem;color:var(--gold);font-weight:700;" id="msg-count">0/40</div>
+      </div>
+      <div style="margin-top:8px;height:6px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;">
+        <div id="msg-bar" style="height:100%;background:linear-gradient(90deg,var(--gold),var(--accent));border-radius:3px;transition:width 0.4s;width:0%"></div>
+      </div>
+    </div>
+    <div class="message-grid" id="message-grid"></div>
+    <div class="message-form">
+      <textarea class="message-textarea" id="msg-text" placeholder="Share a memory, inside joke, or reason MZ is great..."></textarea>
+      <div class="message-form-row">
+        <select class="text-input" id="msg-from" style="flex:0 0 auto;width:auto;padding:10px 16px;">
+          <option value="">Your name...</option>
+        </select>
+        <button class="btn-gold" onclick="addMessage()">Post Message</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== TRAVEL INFO ========== -->
+  <div class="tab-content" id="tab-travel">
+    <div class="card">
+      <h3>Getting There</h3>
+      <div class="travel-step"><div class="travel-step-icon">🚗</div><div class="travel-step-body"><h4>Drive to Folkestone</h4><p>Eurotunnel Le Shuttle terminal, Cheriton, Folkestone CT18 8XX. Arrive at least 30 min before departure.</p></div></div>
+      <div class="travel-step"><div class="travel-step-icon">🚂</div><div class="travel-step-body"><h4>Le Shuttle Crossing</h4><p>Folkestone → Calais. ~35 min crossing. Stay in your car. Booking ref: TBC.</p></div></div>
+      <div class="travel-step"><div class="travel-step-icon">🛣️</div><div class="travel-step-body"><h4>Drive: Calais → Villa</h4><p>~3h 12min (292km) via A16 south. Route has tolls — bring euros or card for péage. Suggested lunch stop around Amiens/Beauvais.</p></div></div>
+      <div class="travel-step"><div class="travel-step-icon">🏠</div><div class="travel-step-body"><h4>Arrive at Villa</h4><p>Mézy-sur-Seine, Yvelines 78250. Check-in from 16:00 (must arrive by 19:00). Hosts: Isabel & Helder.</p></div></div>
+    </div>
+
+    <div class="card">
+      <h3>Villa Address & Contact</h3>
+      <div class="info-grid">
+        <div class="info-item"><div class="info-icon">📍</div><div><div class="info-label">Address</div><div class="info-value">Mézy-sur-Seine, 78250, France</div></div></div>
+        <div class="info-item"><div class="info-icon">🔗</div><div><div class="info-label">Airbnb Listing</div><div class="info-value"><a href="https://www.airbnb.co.uk/rooms/1520338569867774259" style="color:var(--gold);" target="_blank">View on Airbnb →</a></div></div></div>
+        <div class="info-item"><div class="info-icon">👤</div><div><div class="info-label">Hosts</div><div class="info-value">Isabel & Helder (via Airbnb messaging)</div></div></div>
+        <div class="info-item"><div class="info-icon">📱</div><div><div class="info-label">MZ's Phone</div><div class="info-value">TBC</div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Key Reminders</h3>
+      <div class="info-grid">
+        <div class="info-item"><div class="info-icon">🪪</div><div><div class="info-label">Documents</div><div class="info-value">Passport (or valid ID for EU travel)</div></div></div>
+        <div class="info-item"><div class="info-icon">💶</div><div><div class="info-label">Currency</div><div class="info-value">Euros — for tolls, markets, restaurants</div></div></div>
+        <div class="info-item"><div class="info-icon">🔌</div><div><div class="info-label">Plug Type</div><div class="info-value">Type E (French 2-pin) — bring adaptors</div></div></div>
+        <div class="info-item"><div class="info-icon">🚸</div><div><div class="info-label">Driving</div><div class="info-value">Drive on the right! Speed limits: motorway 130km/h, towns 50km/h</div></div></div>
+        <div class="info-item"><div class="info-icon">📶</div><div><div class="info-label">Roaming</div><div class="info-value">UK plans: check your provider's EU roaming policy post-Brexit</div></div></div>
+        <div class="info-item"><div class="info-icon">⛽</div><div><div class="info-label">Fuel</div><div class="info-value">Fill up before Eurotunnel — French fuel is pricier. Toll total est. ~€25–€35.</div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Weather — Mézy-sur-Seine, Early May</h3>
+      <p>Typical early May: 12–20°C daytime, 7–10°C evenings. Mix of sun and showers — pack layers and a light rain jacket. Pool should be pleasant if heated!</p>
+      <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;">
+        <div style="text-align:center;padding:12px 20px;background:var(--dark-surface);border-radius:10px;"><div style="font-size:1.5rem;">☀️</div><div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">High ~20°C</div></div>
+        <div style="text-align:center;padding:12px 20px;background:var(--dark-surface);border-radius:10px;"><div style="font-size:1.5rem;">🌙</div><div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">Low ~8°C</div></div>
+        <div style="text-align:center;padding:12px 20px;background:var(--dark-surface);border-radius:10px;"><div style="font-size:1.5rem;">🌧️</div><div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">~10 rainy days/month</div></div>
+        <div style="text-align:center;padding:12px 20px;background:var(--dark-surface);border-radius:10px;"><div style="font-size:1.5rem;">🕐</div><div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">Sunset ~21:15</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== PACKING ========== -->
+  <div class="tab-content" id="tab-packing">
+    <p style="color:var(--text-muted);margin-bottom:16px;font-size:0.9rem;">Tick items off as you pack. Your progress is saved in this browser.</p>
+    <div class="card"><h3>Essentials</h3><div id="packing-essentials"></div></div>
+    <div class="card"><h3>For the Villa</h3><div id="packing-villa"></div></div>
+    <div class="card"><h3>For the Little One</h3><div id="packing-kid"></div></div>
+    <div class="card"><h3>Nice to Have</h3><div id="packing-nice"></div></div>
+  </div>
+
+</div>
+
+<!-- Firebase SDK (compat mode for single-file simplicity) -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+
+<script>
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  FIREBASE CONFIG — Replace with your own Firebase project!      ║
+// ║  1. Go to https://console.firebase.google.com                   ║
+// ║  2. Create a project (e.g. "mz-40th")                          ║
+// ║  3. Add a Web App (</> icon)                                    ║
+// ║  4. Copy the firebaseConfig object and paste it below           ║
+// ║  5. Enable Realtime Database (Build → Realtime Database)        ║
+// ║  6. Set rules to allow read/write (see SETUP.md)                ║
+// ╚══════════════════════════════════════════════════════════════════╝
+const firebaseConfig = {
+  apiKey: "AIzaSyA7Hs_Yx4iQlIeX-fcsGzO42FovQi2-AsE",
+  authDomain: "mz-40th.firebaseapp.com",
+  databaseURL: "https://mz-40th-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "mz-40th",
+  storageBucket: "mz-40th.firebasestorage.app",
+  messagingSenderId: "982290779853",
+  appId: "1:982290779853:web:7645504352791875b9e384"
+};
+
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const dbRef = db.ref('mz40');
+
+// ===== STATE =====
+const GUESTS = ['MZ','Wife','Brother','Sister','Cousin'];
+let state = {};
+let firebaseReady = false;
+
+function defaultState(){
+  return {
+    voter: '',
+    activities: defaultActivities(),
+    bringItems: defaultBringItems(),
+    messages: [],
+    dietary: {},
+    packed: {}
+  };
+}
+
+function loadState(){
+  // Load voter preference from localStorage (personal, not shared)
+  state = defaultState();
+  state.voter = localStorage.getItem('mz40-voter') || '';
+  state.packed = JSON.parse(localStorage.getItem('mz40-packed') || '{}');
+
+  // Listen for real-time updates from Firebase
+  dbRef.on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      if (data.activities) state.activities = data.activities;
+      if (data.bringItems) state.bringItems = data.bringItems;
+      if (data.messages) state.messages = data.messages;
+      if (data.dietary) state.dietary = data.dietary;
+    }
+    firebaseReady = true;
+    renderAll();
+  }, (error) => {
+    console.warn('Firebase read failed, using defaults:', error.message);
+    firebaseReady = false;
+    renderAll();
+  });
+}
+
+function saveState(){
+  // Save personal prefs locally
+  localStorage.setItem('mz40-voter', state.voter);
+  localStorage.setItem('mz40-packed', JSON.stringify(state.packed));
+
+  // Save shared data to Firebase
+  dbRef.update({
+    activities: state.activities,
+    bringItems: state.bringItems,
+    messages: state.messages,
+    dietary: state.dietary
+  }).catch(err => console.warn('Firebase write failed:', err.message));
+}
+
+// ===== COUNTDOWN =====
+function updateCountdown(){
+  const target=new Date('2026-05-01T07:00:00+01:00');const now=new Date();const diff=target-now;
+  if(diff<=0){document.getElementById('cd-days').textContent='🎉';['cd-hours','cd-mins','cd-secs'].forEach(id=>{document.getElementById(id).textContent='';});return;}
+  document.getElementById('cd-days').textContent=Math.floor(diff/86400000);
+  document.getElementById('cd-hours').textContent=Math.floor((diff%86400000)/3600000);
+  document.getElementById('cd-mins').textContent=Math.floor((diff%3600000)/60000);
+  document.getElementById('cd-secs').textContent=Math.floor((diff%60000)/1000);
+}
+updateCountdown();setInterval(updateCountdown,1000);
+
+// ===== TABS =====
+document.querySelectorAll('.nav-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ===== VOTING =====
+function defaultActivities(){return[
+  {id:'giverny',name:"Monet's Garden, Giverny",desc:'~40 min. Water gardens, Japanese bridge. Open Apr–Nov.',drive:'~40 min',voters:[]},
+  {id:'versailles',name:'Palace of Versailles',desc:'~35 min. Palace, Hall of Mirrors, formal gardens.',drive:'~35 min',voters:[]},
+  {id:'paris',name:'Day trip to Paris',desc:'~45 min. Eiffel Tower, Montmartre, Seine cruise, museums.',drive:'~45 min',voters:[]},
+  {id:'seine-walk',name:'Seine riverside walk',desc:'From the village. Gentle stroll along the river.',drive:'0 min',voters:[]},
+  {id:'vexin',name:'Vexin Natural Park hike',desc:'On the doorstep. Trails, villages, countryside.',drive:'~5 min',voters:[]},
+  {id:'thoiry',name:'Thoiry Zoo (safari park)',desc:'~40 min. Safari park + zoo — brilliant for a 3-year-old.',drive:'~40 min',voters:[]},
+  {id:'bbq',name:'BBQ at the villa',desc:'Summer kitchen on site. Cook together, pétanque, pool.',drive:'At villa',voters:[]},
+  {id:'birthday-dinner',name:'Restaurant birthday dinner',desc:'Find somewhere special for the big night.',drive:'TBD',voters:[]},
+  {id:'picnic',name:'French picnic by the Seine',desc:'Bread, cheese, charcuterie, wine — al fresco.',drive:'0 min',voters:[]},
+  {id:'petanque',name:'Pétanque tournament',desc:'Court on the property. Round-robin with prizes?',drive:'At villa',voters:[]},
+];}
+function renderNamePicker(containerId){
+  document.getElementById(containerId).innerHTML=GUESTS.map(g=>
+    `<button class="name-chip ${state.voter===g?'active':''}" onclick="setVoter('${g}')">${g}</button>`
+  ).join('');
+}
+function setVoter(name){state.voter=name;renderAll();saveState();}
+function toggleVote(id){
+  if(!state.voter)return alert('Pick your name first!');
+  const act=state.activities.find(a=>a.id===id);if(!act)return;
+  const i=act.voters.indexOf(state.voter);
+  if(i>-1)act.voters.splice(i,1);else act.voters.push(state.voter);
+  renderVotes();saveState();
+}
+function renderVotes(){
+  document.getElementById('vote-list').innerHTML=state.activities.map(act=>{
+    const pct=(act.voters.length/GUESTS.length)*100;
+    const voted=act.voters.includes(state.voter);
+    const names=act.voters.length?act.voters.join(', '):'No votes yet';
+    return`<div class="vote-card"><div class="vote-header"><div><h4>${act.name}</h4><div class="vote-desc">${act.desc}</div></div><div class="drive-time">${act.drive}</div></div><div class="vote-bar-container"><div class="vote-bar-bg"><div class="vote-bar-fill" style="width:${pct}%"></div></div><div class="vote-count">${act.voters.length}/${GUESTS.length}</div></div><div class="vote-actions"><button class="vote-btn ${voted?'voted':''}" onclick="toggleVote('${act.id}')">${voted?'✓ Voted':'Vote'}</button><span style="font-size:0.8rem;color:var(--text-muted);line-height:2;">${names}</span></div></div>`;
+  }).join('');
+}
+function suggestActivity(){
+  const inp=document.getElementById('suggest-input');const name=inp.value.trim();if(!name)return;
+  state.activities.push({id:'c-'+Date.now(),name,desc:'Suggested by '+(state.voter||'someone'),drive:'TBD',voters:[]});
+  inp.value='';renderVotes();saveState();
+}
+
+// ===== WHO'S BRINGING WHAT =====
+function defaultBringItems(){return[
+  {id:'b1',cat:'bbq',name:'Burgers & sausages',note:'Enough for 7 adults',claimedBy:''},
+  {id:'b2',cat:'bbq',name:'Burger buns & bread',note:'',claimedBy:''},
+  {id:'b3',cat:'bbq',name:'Salads & sides',note:'Coleslaw, green salad, potato salad',claimedBy:''},
+  {id:'b4',cat:'bbq',name:'BBQ sauces & condiments',note:'Ketchup, mustard, mayo',claimedBy:''},
+  {id:'b5',cat:'bbq',name:'Charcoal / firelighters',note:'Check if villa has gas BBQ',claimedBy:''},
+  {id:'b6',cat:'bbq',name:'Cheese board',note:'For a French touch',claimedBy:''},
+  {id:'b7',cat:'drinks',name:'Wine (red)',note:'3–4 bottles',claimedBy:''},
+  {id:'b8',cat:'drinks',name:'Wine (white / rosé)',note:'3–4 bottles',claimedBy:''},
+  {id:'b9',cat:'drinks',name:'Champagne',note:"It's a 40th! 2–3 bottles",claimedBy:''},
+  {id:'b10',cat:'drinks',name:'Beer / cider',note:'Pack of 12+',claimedBy:''},
+  {id:'b11',cat:'drinks',name:'Soft drinks & juice',note:'For the little one + mixers',claimedBy:''},
+  {id:'b12',cat:'drinks',name:'Coffee & tea',note:'Decent coffee, PG Tips',claimedBy:''},
+  {id:'b13',cat:'breakfast',name:'Croissants & pastries',note:'Buy fresh locally each morning',claimedBy:''},
+  {id:'b14',cat:'breakfast',name:'Eggs, bacon, butter',note:'Full English option',claimedBy:''},
+  {id:'b15',cat:'breakfast',name:'Fruit & yoghurt',note:'',claimedBy:''},
+  {id:'b16',cat:'breakfast',name:'Cereal & milk',note:'For the little one',claimedBy:''},
+  {id:'b17',cat:'birthday',name:'Birthday cake',note:'Order from a patisserie? Or bring?',claimedBy:''},
+  {id:'b18',cat:'birthday',name:'Candles & decorations',note:'Banners, balloons, 4-0 candles',claimedBy:''},
+  {id:'b19',cat:'birthday',name:'Birthday card / gift',note:'',claimedBy:''},
+  {id:'b20',cat:'gear',name:'Bluetooth speaker',note:'For the garden / pool',claimedBy:''},
+  {id:'b21',cat:'gear',name:'Card games / board games',note:'',claimedBy:''},
+  {id:'b22',cat:'gear',name:'Pétanque set',note:'Villa has a court — does it have boules?',claimedBy:''},
+  {id:'b23',cat:'gear',name:'Travel cot',note:'Not provided by villa',claimedBy:''},
+  {id:'b24',cat:'gear',name:'High chair / booster seat',note:'Confirm with hosts',claimedBy:''},
+  {id:'b25',cat:'gear',name:'Plug adaptors (Type E)',note:'French 2-pin sockets',claimedBy:''},
+];}
+const CAT_LABELS={bbq:'BBQ & Cooking',drinks:'Drinks',breakfast:'Breakfast',birthday:'Birthday Bits',gear:'Gear & Equipment',other:'Other'};
+const CAT_ORDER=['bbq','drinks','breakfast','birthday','gear','other'];
+
+function renderBringList(){
+  const grouped={};
+  state.bringItems.forEach(item=>{
+    if(!grouped[item.cat])grouped[item.cat]=[];
+    grouped[item.cat].push(item);
+  });
+  let html='';
+  CAT_ORDER.forEach(cat=>{
+    if(!grouped[cat]||!grouped[cat].length)return;
+    const items=grouped[cat];
+    const claimed=items.filter(i=>i.claimedBy).length;
+    html+=`<div class="bring-category"><div class="bring-category-header"><h4>${CAT_LABELS[cat]||cat}</h4><span style="font-size:0.8rem;color:var(--text-muted);">${claimed}/${items.length} claimed</span></div>`;
+    items.forEach(item=>{
+      const isMine=item.claimedBy===state.voter;
+      const badge=item.claimedBy
+        ?`<span class="claimed-badge claimed">${item.claimedBy}</span>`
+        :`<span class="claimed-badge unclaimed">Unclaimed</span>`;
+      const btn=item.claimedBy
+        ?(isMine?`<button class="claim-btn mine" onclick="unclaimItem('${item.id}')">Drop</button>`:'')
+        :`<button class="claim-btn" onclick="claimItem('${item.id}')">I'll bring this</button>`;
+      html+=`<div class="bring-item"><div class="bring-item-left"><div><div class="bring-item-name">${item.name}</div>${item.note?`<div class="bring-item-note">${item.note}</div>`:''}</div></div><div class="bring-item-right">${badge}${btn}</div></div>`;
+    });
+    html+=`</div>`;
+  });
+  document.getElementById('bring-list').innerHTML=html;
+}
+function claimItem(id){
+  if(!state.voter)return alert('Pick your name first!');
+  const item=state.bringItems.find(i=>i.id===id);if(item)item.claimedBy=state.voter;
+  renderBringList();saveState();
+}
+function unclaimItem(id){
+  const item=state.bringItems.find(i=>i.id===id);if(item)item.claimedBy='';
+  renderBringList();saveState();
+}
+function addBringItem(){
+  const name=document.getElementById('add-bring-name').value.trim();
+  const cat=document.getElementById('add-bring-cat').value;
+  if(!name)return;
+  state.bringItems.push({id:'bi-'+Date.now(),cat,name,note:'Added by '+(state.voter||'someone'),claimedBy:''});
+  document.getElementById('add-bring-name').value='';
+  renderBringList();saveState();
+}
+
+// ===== DIETARY =====
+function renderDietary(){
+  document.getElementById('dietary-grid').innerHTML=GUESTS.map(g=>{
+    const diet=state.dietary[g]||'';
+    return`<div class="dietary-card" onclick="editDietary('${g}')"><div class="name">${g}</div><div class="diet ${diet?'':'empty'}">${diet||'Click to add'}</div></div>`;
+  }).join('');
+}
+function editDietary(guest){
+  const current=state.dietary[guest]||'';
+  const val=prompt(`Dietary requirements for ${guest}:`,current);
+  if(val!==null){state.dietary[guest]=val;renderDietary();saveState();}
+}
+
+// ===== MESSAGE WALL =====
+function renderMessages(){
+  const grid=document.getElementById('message-grid');
+  grid.innerHTML=state.messages.map((m,i)=>{
+    const colors=[
+      'var(--gold)','var(--accent)','var(--blue)','var(--green)','var(--purple)','var(--pink)'
+    ];
+    return`<div class="message-card" style="border-left-color:${colors[i%colors.length]}"><div class="msg-text">"${escHtml(m.text)}"</div><div class="msg-from">— ${escHtml(m.from)}</div></div>`;
+  }).join('');
+  document.getElementById('msg-count').textContent=state.messages.length+'/40';
+  document.getElementById('msg-bar').style.width=(state.messages.length/40*100)+'%';
+  // populate the from dropdown
+  const sel=document.getElementById('msg-from');
+  sel.innerHTML='<option value="">Your name...</option>'+GUESTS.map(g=>`<option value="${g}">${g}</option>`).join('');
+}
+function addMessage(){
+  const text=document.getElementById('msg-text').value.trim();
+  const from=document.getElementById('msg-from').value;
+  if(!text)return alert('Write a message first!');
+  if(!from)return alert('Pick your name!');
+  state.messages.push({text,from,ts:Date.now()});
+  document.getElementById('msg-text').value='';
+  renderMessages();saveState();
+}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ===== PACKING =====
+const PACKING={
+  essentials:['Passports','Driving licences','Travel insurance docs','Euros (cash for tolls, markets)','Phone chargers','Car seat for the little one','Eurotunnel booking ref','Airbnb booking confirmation'],
+  villa:['Swimwear','Towels (check if villa provides)','Sun cream','Sunglasses','Light jacket (May evenings can be cool)','Comfortable walking shoes','Flip-flops / pool shoes','Rain jacket (just in case)'],
+  kid:['Travel cot (villa doesn\'t provide)','High chair / booster (check with hosts)','Nappies / pull-ups','Favourite toys & books','Car snacks','Reins / harness','Sun hat','Lightweight buggy'],
+  nice:['Bluetooth speaker','Card games / board games','Camera','Birthday decorations','Cake candles','French phrasebook (fun for the group)']
+};
+function renderPacking(){
+  Object.entries(PACKING).forEach(([key,items])=>{
+    document.getElementById('packing-'+key).innerHTML=items.map((item,i)=>{
+      const id=key+'-'+i;const checked=state.packed[id]?'checked':'';
+      return`<div class="checklist-item ${checked}" onclick="togglePack('${id}',this)"><div class="checklist-box"></div><div class="checklist-text">${item}</div></div>`;
+    }).join('');
+  });
+}
+function togglePack(id,el){state.packed[id]=!state.packed[id];el.classList.toggle('checked');saveState();}
+
+// ===== CONNECTION STATUS =====
+function renderConnectionStatus(){
+  let el = document.getElementById('connection-status');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'connection-status';
+    el.style.cssText = 'position:fixed;bottom:16px;right:16px;padding:6px 14px;border-radius:20px;font-size:0.75rem;font-weight:500;z-index:999;font-family:Inter,sans-serif;transition:all 0.3s;';
+    document.body.appendChild(el);
+  }
+  if(firebaseConfig.apiKey === 'YOUR_API_KEY'){
+    el.style.background = 'rgba(233,69,96,0.2)';
+    el.style.color = '#e94560';
+    el.style.border = '1px solid rgba(233,69,96,0.4)';
+    el.textContent = '⚠ Firebase not configured — see SETUP.md';
+  } else if(firebaseReady){
+    el.style.background = 'rgba(74,222,128,0.15)';
+    el.style.color = '#4ade80';
+    el.style.border = '1px solid rgba(74,222,128,0.3)';
+    el.textContent = '● Live — syncing across all devices';
+  } else {
+    el.style.background = 'rgba(201,168,76,0.15)';
+    el.style.color = '#c9a84c';
+    el.style.border = '1px solid rgba(201,168,76,0.3)';
+    el.textContent = '○ Connecting...';
+  }
+}
+
+// ===== RENDER ALL =====
+function renderAll(){
+  renderNamePicker('vote-name-picker');
+  renderNamePicker('bring-name-picker');
+  renderVotes();
+  renderBringList();
+  renderDietary();
+  renderMessages();
+  renderPacking();
+  renderConnectionStatus();
+}
+
+// ===== INIT =====
+loadState();
+renderAll();
+</script>
+</body>
+</html>
