@@ -263,14 +263,15 @@
   <div class="tab-content active" id="tab-overview">
     <div class="section-label">The Crew</div>
     <div class="guest-grid" style="margin-bottom:24px;">
-      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--gold),var(--accent));">MZ</div><div class="guest-name">Michael</div><div class="guest-role">Birthday legend</div></div>
+      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--gold),var(--accent));">MZ</div><div class="guest-name">Michael</div><div class="guest-role">Middle-Aged Man</div></div>
       <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--accent),var(--gold));">SB</div><div class="guest-name">Sheetal</div><div class="guest-role">Wife</div></div>
-      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--green),var(--blue));">LZ</div><div class="guest-name">Leo</div><div class="guest-role">Chief explorer (age 3)</div></div>
+      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--green),var(--blue));">LZ</div><div class="guest-name">Leo</div><div class="guest-role">Chief explorer (age 3.5)</div></div>
       <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--blue),var(--purple));">BZ</div><div class="guest-name">Basil</div><div class="guest-role">Brother</div></div>
       <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--pink),var(--accent));">PZ</div><div class="guest-name">Penelope</div><div class="guest-role">Sister</div></div>
       <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--purple),var(--gold));">AK</div><div class="guest-name">Aleco</div><div class="guest-role">Cousin</div></div>
       <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--blue),var(--green));">WS</div><div class="guest-name">Wayne</div><div class="guest-role">Friend</div></div>
       <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--pink),var(--purple));">H</div><div class="guest-name">Harriet</div><div class="guest-role">Friend</div></div>
+      <div class="guest-card"><div class="guest-avatar" style="background:linear-gradient(135deg,var(--green),var(--gold));">NK</div><div class="guest-name">Nicholas</div><div class="guest-role">Cousin (honorary)</div></div>
     </div>
 
     <div class="section-label">The Villa</div>
@@ -489,12 +490,13 @@ const EMAIL_TO_GUEST = {
   'penelope@example.com': 'Penelope',
   'aleco@example.com': 'Aleco',
   'wayne@example.com': 'Wayne',
-  'harriet@example.com': 'Harriet'
+  'harriet@example.com': 'Harriet',
+  'nicholas@example.com': 'Nicholas'
 };
 let currentGuest = null;
 
 // ===== STATE =====
-const GUESTS = ['Michael','Sheetal','Basil','Penelope','Aleco','Wayne','Harriet'];
+const GUESTS = ['Michael','Sheetal','Basil','Penelope','Aleco','Wayne','Harriet','Nicholas'];
 let state = {};
 let firebaseReady = false;
 
@@ -518,7 +520,7 @@ function loadState(){
   dbRef.on('value', (snapshot) => {
     const data = snapshot.val();
     if (data) {
-      if (data.activities) state.activities = data.activities;
+      if (data.activities) state.activities = data.activities.map(a => ({...a, voters: a.voters || []}));
       if (data.bringItems) state.bringItems = data.bringItems;
       if (data.messages) state.messages = data.messages;
       if (data.dietary) state.dietary = data.dietary;
@@ -581,12 +583,14 @@ function defaultActivities(){return[
 function toggleVote(id){
   if(!currentGuest)return;
   const act=state.activities.find(a=>a.id===id);if(!act)return;
+  if(!act.voters)act.voters=[];
   const i=act.voters.indexOf(state.voter);
   if(i>-1)act.voters.splice(i,1);else act.voters.push(state.voter);
   renderVotes();saveState();
 }
 function renderVotes(){
   document.getElementById('vote-list').innerHTML=state.activities.map(act=>{
+    if(!act.voters)act.voters=[];
     const pct=(act.voters.length/GUESTS.length)*100;
     const voted=act.voters.includes(state.voter);
     const names=act.voters.length?act.voters.join(', '):'No votes yet';
