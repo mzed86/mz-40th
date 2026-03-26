@@ -166,13 +166,18 @@
   .login-card .login-field input:focus{outline:none;border-color:var(--gold);}
   .login-card .login-field input::placeholder{color:var(--text-muted);}
   .login-error{color:var(--accent);font-size:0.85rem;margin-bottom:12px;min-height:20px;}
+  .login-success{color:var(--green);font-size:0.85rem;margin-bottom:12px;min-height:20px;}
   .login-btn{width:100%;padding:14px;border-radius:8px;border:none;background:var(--gold);color:var(--dark);font-family:'Inter',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;margin-bottom:16px;transition:opacity 0.2s;}
   .login-btn:hover{opacity:0.9;}
   .login-btn:disabled{opacity:0.5;cursor:not-allowed;}
-  .login-toggle{color:var(--gold);font-size:0.85rem;cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif;text-decoration:underline;text-underline-offset:2px;}
-  .login-toggle:hover{opacity:0.8;}
-  .invite-field{display:none;}
-  .invite-field.show{display:block;}
+  .login-hint{color:var(--text-muted);font-size:0.8rem;margin-top:-8px;margin-bottom:16px;}
+  .email-sent-state{display:none;text-align:center;}
+  .email-sent-state.show{display:block;}
+  .email-sent-state .sent-icon{font-size:3rem;margin-bottom:12px;}
+  .email-sent-state .sent-msg{color:var(--text);font-size:1rem;margin-bottom:8px;}
+  .email-sent-state .sent-detail{color:var(--text-muted);font-size:0.85rem;line-height:1.5;margin-bottom:20px;}
+  .email-sent-state button{background:none;border:none;color:var(--gold);font-family:'Inter',sans-serif;font-size:0.85rem;cursor:pointer;text-decoration:underline;text-underline-offset:2px;}
+  .email-sent-state button:hover{opacity:0.8;}
   #sign-out-btn{position:absolute;top:16px;right:16px;z-index:2;padding:6px 16px;border-radius:20px;border:1px solid rgba(201,168,76,0.3);background:transparent;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:0.78rem;cursor:pointer;transition:all 0.2s;}
   #sign-out-btn:hover{border-color:var(--gold);color:var(--text);}
   .hero-identity{font-size:0.85rem;color:var(--text-muted);margin-top:8px;position:relative;z-index:1;}
@@ -201,22 +206,23 @@
 <div id="login-screen">
   <div class="login-card">
     <h1>MZ's 40th</h1>
-    <div class="login-subtitle">Sign in to join the planning</div>
+    <div class="login-subtitle">Enter your email to get a magic sign-in link</div>
     <div id="login-error" class="login-error"></div>
-    <div class="login-field">
-      <label>Email</label>
-      <input type="email" id="login-email" placeholder="your@email.com" autocomplete="email">
+    <div id="login-success" class="login-success"></div>
+    <div id="email-form-state">
+      <div class="login-field">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="your@email.com" autocomplete="email">
+      </div>
+      <button class="login-btn" id="login-btn" onclick="doAuth()">Send Magic Link</button>
+      <div class="login-hint">Only invited guests can sign in</div>
     </div>
-    <div class="login-field">
-      <label>Password</label>
-      <input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
+    <div id="email-sent-state" class="email-sent-state">
+      <div class="sent-icon">✉️</div>
+      <div class="sent-msg">Check your inbox!</div>
+      <div class="sent-detail">We sent a sign-in link to <strong id="sent-email"></strong>. Click the link in the email to join.</div>
+      <button onclick="resetLoginForm()">Use a different email</button>
     </div>
-    <div class="login-field invite-field" id="invite-field">
-      <label>Invite Code</label>
-      <input type="text" id="invite-code" placeholder="Enter the invite code" autocomplete="off">
-    </div>
-    <button class="login-btn" id="login-btn" onclick="doAuth()">Sign In</button>
-    <button class="login-toggle" id="login-toggle" onclick="toggleAuthMode()">Need an account? Sign up</button>
   </div>
 </div>
 
@@ -477,17 +483,15 @@ const auth = firebase.auth();
 // ===== AUTH CONFIG =====
 // Map each guest's email to their display name. Update these with real emails before deploying.
 const EMAIL_TO_GUEST = {
-  'michael@example.com': 'Michael',
-  'sheetal@example.com': 'Sheetal',
+  'REDACTED@example.com': 'Michael',
+  'REDACTED@example.com': 'Sheetal',
   'basil@example.com': 'Basil',
   'penelope@example.com': 'Penelope',
   'aleco@example.com': 'Aleco',
   'wayne@example.com': 'Wayne',
   'harriet@example.com': 'Harriet'
 };
-const INVITE_CODE = 'mezy2026'; // Share this privately with guests
 let currentGuest = null;
-let authMode = 'login'; // 'login' or 'signup'
 
 // ===== STATE =====
 const GUESTS = ['Michael','Sheetal','Basil','Penelope','Aleco','Wayne','Harriet'];
@@ -771,53 +775,75 @@ function renderAll(){
 // ===== AUTH FUNCTIONS =====
 function doAuth(){
   const email=document.getElementById('login-email').value.trim();
-  const password=document.getElementById('login-password').value;
   clearLoginError();
-  if(!email||!password)return showLoginError('Enter email and password.');
+  if(!email)return showLoginError('Enter your email address.');
+  if(!EMAIL_TO_GUEST[email.toLowerCase()])return showLoginError('This email is not on the guest list.');
   document.getElementById('login-btn').disabled=true;
 
-  if(authMode==='signup'){
-    const code=document.getElementById('invite-code').value.trim();
-    if(code!==INVITE_CODE){document.getElementById('login-btn').disabled=false;return showLoginError('Invalid invite code.');}
-    if(!EMAIL_TO_GUEST[email.toLowerCase()]){document.getElementById('login-btn').disabled=false;return showLoginError('This email is not on the guest list.');}
-    auth.createUserWithEmailAndPassword(email,password)
-      .catch(err=>{document.getElementById('login-btn').disabled=false;showLoginError(friendlyError(err.code));});
-  } else {
-    auth.signInWithEmailAndPassword(email,password)
-      .catch(err=>{document.getElementById('login-btn').disabled=false;showLoginError(friendlyError(err.code));});
-  }
+  const actionCodeSettings={
+    url: window.location.href.split('?')[0], // redirect back to this page
+    handleCodeInApp: true
+  };
+
+  auth.sendSignInLinkToEmail(email, actionCodeSettings)
+    .then(()=>{
+      localStorage.setItem('mz40-signin-email', email);
+      document.getElementById('sent-email').textContent=email;
+      document.getElementById('email-form-state').style.display='none';
+      document.getElementById('email-sent-state').classList.add('show');
+      clearLoginError();
+    })
+    .catch(err=>{
+      document.getElementById('login-btn').disabled=false;
+      showLoginError(friendlyError(err.code));
+    });
+}
+
+function resetLoginForm(){
+  document.getElementById('email-form-state').style.display='';
+  document.getElementById('email-sent-state').classList.remove('show');
+  document.getElementById('login-btn').disabled=false;
+  clearLoginError();
 }
 
 function doSignOut(){auth.signOut();}
 
-function toggleAuthMode(){
-  authMode=authMode==='login'?'signup':'login';
-  document.getElementById('login-btn').textContent=authMode==='signup'?'Sign Up':'Sign In';
-  document.getElementById('login-toggle').textContent=authMode==='signup'?'Already have an account? Sign in':'Need an account? Sign up';
-  document.getElementById('invite-field').classList.toggle('show',authMode==='signup');
-  document.getElementById('login-password').autocomplete=authMode==='signup'?'new-password':'current-password';
-  clearLoginError();
-}
-
-function showLoginError(msg){document.getElementById('login-error').textContent=msg;}
-function clearLoginError(){document.getElementById('login-error').textContent='';}
+function showLoginError(msg){document.getElementById('login-error').textContent=msg;document.getElementById('login-success').textContent='';}
+function showLoginSuccess(msg){document.getElementById('login-success').textContent=msg;document.getElementById('login-error').textContent='';}
+function clearLoginError(){document.getElementById('login-error').textContent='';document.getElementById('login-success').textContent='';}
 function friendlyError(code){
   const map={
-    'auth/wrong-password':'Incorrect password.',
-    'auth/invalid-credential':'Incorrect email or password.',
-    'auth/user-not-found':'No account with that email. Sign up first.',
-    'auth/email-already-in-use':'Account already exists. Try signing in.',
-    'auth/weak-password':'Password must be at least 6 characters.',
     'auth/invalid-email':'Invalid email address.',
-    'auth/too-many-requests':'Too many attempts. Try again later.'
+    'auth/too-many-requests':'Too many attempts. Try again later.',
+    'auth/invalid-action-code':'This sign-in link has expired or already been used. Request a new one.',
+    'auth/expired-action-code':'This sign-in link has expired. Request a new one.'
   };
   return map[code]||'Something went wrong. Try again.';
 }
 
 // Enter key triggers login
 document.getElementById('login-email').addEventListener('keydown',e=>{if(e.key==='Enter')doAuth();});
-document.getElementById('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')doAuth();});
-document.getElementById('invite-code').addEventListener('keydown',e=>{if(e.key==='Enter')doAuth();});
+
+// ===== HANDLE MAGIC LINK REDIRECT =====
+// When user clicks the email link, they land back here with special URL params
+if(auth.isSignInWithEmailLink(window.location.href)){
+  let email=localStorage.getItem('mz40-signin-email');
+  if(!email){
+    // User opened the link on a different device/browser
+    email=window.prompt('Please enter your email to confirm sign-in:');
+  }
+  if(email){
+    auth.signInWithEmailLink(email, window.location.href)
+      .then(()=>{
+        localStorage.removeItem('mz40-signin-email');
+        // Clean the URL so the link params don't linger
+        window.history.replaceState(null,'',window.location.pathname);
+      })
+      .catch(err=>{
+        showLoginError(friendlyError(err.code));
+      });
+  }
+}
 
 // ===== INIT — Auth State Observer =====
 auth.onAuthStateChanged((user)=>{
@@ -839,8 +865,7 @@ auth.onAuthStateChanged((user)=>{
     currentGuest=null;
     document.getElementById('login-screen').classList.remove('hidden');
     document.getElementById('app-content').classList.add('hidden');
-    document.getElementById('login-btn').disabled=false;
-    clearLoginError();
+    resetLoginForm();
   }
 });
 </script>
