@@ -482,21 +482,24 @@ const dbRef = db.ref('mz40');
 const auth = firebase.auth();
 
 // ===== AUTH CONFIG =====
-// Map each guest's email to their display name. Update these with real emails before deploying.
-const EMAIL_TO_GUEST = {
-  'REDACTED@example.com': 'Michael',
-  'REDACTED@example.com': 'Sheetal',
-  'basil@example.com': 'Basil',
-  'penelope@example.com': 'Penelope',
-  'aleco@example.com': 'Aleco',
-  'wayne@example.com': 'Wayne',
-  'harriet@example.com': 'Harriet',
-  'nicholas@example.com': 'Nicholas'
-};
+// Email-to-guest mapping is stored in Firebase at mz40/emailToGuest (requires auth to read).
+// To add/update guests, edit the data in Firebase Realtime Database directly.
+let EMAIL_TO_GUEST = {};
+let GUESTS = [];
 let currentGuest = null;
 
-// ===== STATE =====
-const GUESTS = ['Michael','Sheetal','Basil','Penelope','Aleco','Wayne','Harriet','Nicholas'];
+function emailToKey(email){ return email.toLowerCase().replace(/\./g, ','); }
+
+function loadGuestList(){
+  return db.ref('mz40/emailToGuest').once('value').then(snap => {
+    const data = snap.val() || {};
+    EMAIL_TO_GUEST = {};
+    Object.entries(data).forEach(([key, name]) => {
+      EMAIL_TO_GUEST[key.replace(/,/g, '.')] = name;
+    });
+    GUESTS = Object.values(EMAIL_TO_GUEST);
+  });
+}
 let state = {};
 let firebaseReady = false;
 
@@ -781,7 +784,7 @@ function doAuth(){
   const email=document.getElementById('login-email').value.trim();
   clearLoginError();
   if(!email)return showLoginError('Enter your email address.');
-  if(!EMAIL_TO_GUEST[email.toLowerCase()])return showLoginError('This email is not on the guest list.');
+  if(!email.includes('@'))return showLoginError('Enter a valid email address.');
   document.getElementById('login-btn').disabled=true;
 
   const actionCodeSettings={
@@ -852,19 +855,24 @@ if(auth.isSignInWithEmailLink(window.location.href)){
 // ===== INIT — Auth State Observer =====
 auth.onAuthStateChanged((user)=>{
   if(user){
-    const guestName=EMAIL_TO_GUEST[user.email.toLowerCase()];
-    if(!guestName){
+    loadGuestList().then(()=>{
+      const guestName=EMAIL_TO_GUEST[user.email.toLowerCase()];
+      if(!guestName){
+        auth.signOut();
+        showLoginError('This email is not on the guest list.');
+        return;
+      }
+      currentGuest=guestName;
+      state.voter=guestName;
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('app-content').classList.remove('hidden');
+      document.getElementById('hero-guest-name').textContent=guestName;
+      loadState();
+      renderAll();
+    }).catch(()=>{
       auth.signOut();
-      showLoginError('This email is not on the guest list.');
-      return;
-    }
-    currentGuest=guestName;
-    state.voter=guestName;
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('app-content').classList.remove('hidden');
-    document.getElementById('hero-guest-name').textContent=guestName;
-    loadState();
-    renderAll();
+      showLoginError('Could not verify guest list. Try again.');
+    });
   } else {
     currentGuest=null;
     document.getElementById('login-screen').classList.remove('hidden');
