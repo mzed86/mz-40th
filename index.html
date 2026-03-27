@@ -189,12 +189,17 @@
     .countdown-bar{gap:16px;padding:16px;}
     .countdown-unit .num{font-size:1.5rem;}
     .container{padding:16px;}
-    .nav-tabs{gap:2px;padding:4px;}
-    .nav-tab{padding:10px 8px;font-size:0.75rem;}
+    .nav-tabs{gap:2px;padding:4px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+    .nav-tabs::-webkit-scrollbar{display:none;}
+    .nav-tab{flex:none;padding:10px 12px;font-size:0.75rem;}
     .vote-header{flex-direction:column;}
     .bring-item{flex-direction:column;align-items:flex-start;}
     .bring-item-right{width:100%;justify-content:flex-end;}
+    .suggest-form{flex-direction:column;}
+    .add-item-row{flex-direction:column;}
+    .add-item-row select{width:100%;}
     .message-grid{grid-template-columns:1fr;}
+    .message-form-row{flex-direction:column;}
     .login-card{padding:28px 20px;}
     #sign-out-btn{top:10px;right:10px;font-size:0.72rem;padding:5px 12px;}
   }
