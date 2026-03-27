@@ -860,6 +860,7 @@ function doAuth(){
       clearLoginError();
     })
     .catch(err=>{
+      console.error('sendSignInLinkToEmail failed:', err.code, err.message);
       document.getElementById('login-btn').disabled=false;
       showLoginError(friendlyError(err.code));
     });
@@ -868,7 +869,12 @@ function doAuth(){
 function resetLoginForm(){
   document.getElementById('email-form-state').style.display='';
   document.getElementById('email-sent-state').classList.remove('show');
+  document.getElementById('magic-link-state').style.display='none';
+  document.getElementById('magic-link-state').classList.remove('show');
   document.getElementById('login-btn').disabled=false;
+  document.querySelector('.login-subtitle').textContent='Enter your email to get a magic sign-in link';
+  document.getElementById('login-btn').textContent='Send Magic Link';
+  document.querySelector('.login-hint').textContent='Only invited guests can sign in';
   clearLoginError();
 }
 
@@ -882,9 +888,16 @@ function friendlyError(code){
     'auth/invalid-email':'Invalid email address.',
     'auth/too-many-requests':'Too many attempts. Try again later.',
     'auth/invalid-action-code':'This sign-in link has expired or already been used. Request a new one.',
-    'auth/expired-action-code':'This sign-in link has expired. Request a new one.'
+    'auth/expired-action-code':'This sign-in link has expired. Request a new one.',
+    'auth/unauthorized-continue-uri':'Sign-in is not configured for this domain. Ask MZ to add it in Firebase.',
+    'auth/operation-not-allowed':'Email link sign-in is not enabled. Ask MZ to enable it in Firebase.',
+    'auth/missing-continue-uri':'Sign-in configuration error (missing redirect URL).',
+    'auth/invalid-continue-uri':'Sign-in configuration error (invalid redirect URL).',
+    'auth/network-request-failed':'Network error — check your connection and try again.'
   };
-  return map[code]||'Something went wrong. Try again.';
+  if(map[code]) return map[code];
+  console.error('Auth error code:', code);
+  return 'Something went wrong ('+code+'). Try again.';
 }
 
 // Enter key triggers login
