@@ -868,7 +868,12 @@ function doAuth(){
 function resetLoginForm(){
   document.getElementById('email-form-state').style.display='';
   document.getElementById('email-sent-state').classList.remove('show');
+  document.getElementById('magic-link-state').style.display='none';
+  document.getElementById('magic-link-state').classList.remove('show');
   document.getElementById('login-btn').disabled=false;
+  document.querySelector('.login-subtitle').textContent='Enter your email to get a magic sign-in link';
+  document.getElementById('login-btn').textContent='Send Magic Link';
+  document.querySelector('.login-hint').textContent='Only invited guests can sign in';
   clearLoginError();
 }
 
