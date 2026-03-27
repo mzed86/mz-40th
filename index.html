@@ -40,9 +40,8 @@
   .nav-tab{flex:1;padding:12px 10px;border:none;background:transparent;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;border-radius:8px;cursor:pointer;transition:all 0.2s;white-space:nowrap;min-width:0;}
   .nav-tab:hover{color:var(--text);background:var(--dark-surface);}
   .nav-tab.active{color:var(--gold);background:var(--dark-surface);}
-  .hamburger-btn{display:none;width:100%;padding:14px 16px;background:var(--dark-card);border:1px solid rgba(201,168,76,0.2);border-radius:12px;color:var(--gold);font-family:'Inter',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;text-align:left;margin-bottom:8px;}
-  .hamburger-btn .hamburger-icon{float:right;font-size:1.2rem;}
-  .mobile-dropdown{display:none;background:var(--dark-card);border-radius:12px;border:1px solid rgba(201,168,76,0.2);overflow:hidden;margin-bottom:24px;}
+  .hamburger-btn{display:none;position:fixed;top:12px;right:12px;z-index:1000;width:44px;height:44px;padding:0;background:var(--dark-card);border:1px solid rgba(201,168,76,0.3);border-radius:10px;color:var(--gold);font-size:1.4rem;cursor:pointer;text-align:center;line-height:44px;box-shadow:0 2px 12px rgba(0,0,0,0.4);}
+  .mobile-dropdown{display:none;position:fixed;top:64px;right:12px;z-index:1000;width:220px;background:var(--dark-card);border-radius:12px;border:1px solid rgba(201,168,76,0.2);overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.5);}
   .mobile-dropdown.open{display:block;}
   .mobile-dropdown .nav-tab{display:block;width:100%;text-align:left;padding:14px 20px;border-radius:0;font-size:0.9rem;border-bottom:1px solid rgba(255,255,255,0.03);}
   .mobile-dropdown .nav-tab:last-child{border-bottom:none;}
@@ -271,11 +270,9 @@
     <button class="nav-tab" data-tab="travel">Travel Info</button>
     <button class="nav-tab" data-tab="packing">Packing</button>
   </div>
-  <!-- NAV — Mobile hamburger -->
+  <!-- NAV — Mobile hamburger (positioned fixed via CSS) -->
   <div class="mobile-nav">
-    <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileNav()">
-      <span id="hamburger-label">Overview</span><span class="hamburger-icon">☰</span>
-    </button>
+    <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileNav()">☰</button>
     <div class="mobile-dropdown" id="mobile-dropdown">
       <button class="nav-tab active" data-tab="overview">Overview</button>
       <button class="nav-tab" data-tab="itinerary">Itinerary</button>
@@ -596,9 +593,7 @@ document.querySelectorAll('.nav-tab').forEach(tab=>{
     // Mark active in both desktop and mobile navs
     document.querySelectorAll('.nav-tab[data-tab="'+tab.dataset.tab+'"]').forEach(t=>t.classList.add('active'));
     document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
-    // Update hamburger label and close dropdown
-    const label=document.getElementById('hamburger-label');
-    if(label)label.textContent=tab.textContent;
+    // Close mobile dropdown
     const dd=document.getElementById('mobile-dropdown');
     if(dd)dd.classList.remove('open');
   });
