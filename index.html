@@ -235,6 +235,11 @@
       <div class="sent-detail">We sent a sign-in link to <strong id="sent-email"></strong>. Click the link in the email to join.</div>
       <button onclick="resetLoginForm()">Use a different email</button>
     </div>
+    <div id="magic-link-state" class="email-sent-state" style="display:none;">
+      <div class="sent-icon">🔓</div>
+      <div class="sent-msg">Signing you in…</div>
+      <div class="sent-detail">Hang tight, completing your sign-in now.</div>
+    </div>
   </div>
 </div>
 
@@ -822,6 +827,24 @@ function doAuth(){
   if(!email.includes('@'))return showLoginError('Enter a valid email address.');
   document.getElementById('login-btn').disabled=true;
 
+  // If we're on a magic link URL (different device/browser), complete sign-in instead of sending a new link
+  if(auth.isSignInWithEmailLink(window.location.href)){
+    document.getElementById('email-form-state').style.display='none';
+    document.getElementById('magic-link-state').style.display='';
+    document.getElementById('magic-link-state').classList.add('show');
+    auth.signInWithEmailLink(email, window.location.href)
+      .then(()=>{
+        window.history.replaceState(null,'',window.location.pathname);
+      })
+      .catch(err=>{
+        document.getElementById('magic-link-state').style.display='none';
+        document.getElementById('email-form-state').style.display='';
+        document.getElementById('login-btn').disabled=false;
+        showLoginError(friendlyError(err.code));
+      });
+    return;
+  }
+
   const actionCodeSettings={
     url: window.location.href.split('?')[0], // redirect back to this page
     handleCodeInApp: true
@@ -871,17 +894,23 @@ document.getElementById('login-email').addEventListener('keydown',e=>{if(e.key==
 if(auth.isSignInWithEmailLink(window.location.href)){
   let email=localStorage.getItem('mz40-signin-email');
   if(!email){
-    // User opened the link on a different device/browser
-    email=window.prompt('Please enter your email to confirm sign-in:');
-  }
-  if(email){
+    // User opened the link on a different device/browser — need their email
+    // Show the login form so they can enter it, with a helpful message
+    showLoginSuccess('Almost there — enter your email to complete sign-in.');
+  } else {
+    // Same browser: hide the login form and show a "signing in" state
+    document.getElementById('email-form-state').style.display='none';
+    document.getElementById('magic-link-state').style.display='';
+    document.getElementById('magic-link-state').classList.add('show');
     auth.signInWithEmailLink(email, window.location.href)
       .then(()=>{
         localStorage.removeItem('mz40-signin-email');
-        // Clean the URL so the link params don't linger
         window.history.replaceState(null,'',window.location.pathname);
       })
       .catch(err=>{
+        // Show error and let them retry via the normal form
+        document.getElementById('magic-link-state').style.display='none';
+        document.getElementById('email-form-state').style.display='';
         showLoginError(friendlyError(err.code));
       });
   }
