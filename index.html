@@ -893,7 +893,8 @@ function friendlyError(code){
     'auth/operation-not-allowed':'Email link sign-in is not enabled. Ask MZ to enable it in Firebase.',
     'auth/missing-continue-uri':'Sign-in configuration error (missing redirect URL).',
     'auth/invalid-continue-uri':'Sign-in configuration error (invalid redirect URL).',
-    'auth/network-request-failed':'Network error — check your connection and try again.'
+    'auth/network-request-failed':'Network error — check your connection and try again.',
+    'auth/quota-exceeded':'Too many sign-in emails sent today. Try again tomorrow or ask MZ to upgrade the Firebase plan.'
   };
   if(map[code]) return map[code];
   console.error('Auth error code:', code);
