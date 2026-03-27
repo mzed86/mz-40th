@@ -505,6 +505,7 @@ const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const dbRef = db.ref('mz40');
 const auth = firebase.auth();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 // ===== AUTH CONFIG =====
 // Email-to-guest mapping is stored in Firebase at mz40/emailToGuest (requires auth to read).
