@@ -845,8 +845,9 @@ function doAuth(){
     return;
   }
 
+  const baseUrl=window.location.href.split('?')[0];
   const actionCodeSettings={
-    url: window.location.href.split('?')[0], // redirect back to this page
+    url: baseUrl+'?signin_email='+encodeURIComponent(email), // include email so it survives in-app browsers
     handleCodeInApp: true
   };
 
@@ -892,16 +893,17 @@ document.getElementById('login-email').addEventListener('keydown',e=>{if(e.key==
 // ===== HANDLE MAGIC LINK REDIRECT =====
 // When user clicks the email link, they land back here with special URL params
 if(auth.isSignInWithEmailLink(window.location.href)){
-  let email=localStorage.getItem('mz40-signin-email');
+  // Try to get email from localStorage (same browser) or URL param (in-app browser / different context)
+  const urlEmail=new URLSearchParams(window.location.search).get('signin_email');
+  let email=localStorage.getItem('mz40-signin-email')||urlEmail;
   if(!email){
-    // User opened the link on a different device/browser — need their email
-    // Update the UI so it doesn't say "get a magic link" (they already have one)
+    // No email available anywhere — ask the user (rare edge case)
     document.querySelector('.login-subtitle').textContent='Enter your email to complete sign-in';
     document.getElementById('login-btn').textContent='Sign In';
     document.querySelector('.login-hint').textContent='Enter the same email the magic link was sent to';
     showLoginSuccess('Almost there — enter your email to finish signing in.');
   } else {
-    // Same browser: hide the login form and show a "signing in" state
+    // We have the email — auto sign-in
     document.getElementById('email-form-state').style.display='none';
     document.getElementById('magic-link-state').style.display='';
     document.getElementById('magic-link-state').classList.add('show');
