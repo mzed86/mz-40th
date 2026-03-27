@@ -525,7 +525,7 @@ function loadGuestList(){
     Object.entries(data).forEach(([key, name]) => {
       EMAIL_TO_GUEST[key.replace(/,/g, '.')] = name;
     });
-    GUESTS = Object.values(EMAIL_TO_GUEST);
+    GUESTS = [...new Set(Object.values(EMAIL_TO_GUEST))];
   });
 }
 let state = {};
