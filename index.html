@@ -18,7 +18,7 @@
   body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;}
 
   /* ===== HERO ===== */
-  .hero{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);padding:60px 24px 40px;text-align:center;position:relative;overflow:hidden;}
+  .hero{background:linear-gradient(135deg,rgba(26,26,46,0.75) 0%,rgba(22,33,62,0.8) 50%,rgba(15,52,96,0.75) 100%),url('hero-bg.jpg') center/cover no-repeat;padding:60px 24px 40px;text-align:center;position:relative;overflow:hidden;}
   .hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 40%,rgba(201,168,76,0.08) 0%,transparent 50%),radial-gradient(circle at 70% 60%,rgba(233,69,96,0.05) 0%,transparent 50%);animation:shimmer 20s ease-in-out infinite;}
   @keyframes shimmer{0%,100%{transform:translate(0,0);}50%{transform:translate(-5%,5%);}}
   .hero h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);color:var(--gold);position:relative;z-index:1;}
@@ -725,7 +725,7 @@ function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(
 const PACKING={
   essentials:['Passports','Driving licences','Travel insurance docs','Euros (cash for tolls, markets)','Phone chargers','Car seat for the little one','Eurotunnel booking ref','Airbnb booking confirmation'],
   villa:['Swimwear','Towels (check if villa provides)','Sun cream','Sunglasses','Light jacket (May evenings can be cool)','Comfortable walking shoes','Flip-flops / pool shoes','Rain jacket (just in case)'],
-  kid:['Travel cot (villa doesn\'t provide)','High chair / booster (check with hosts)','Nappies / pull-ups','Favourite toys & books','Car snacks','Reins / harness','Sun hat','Lightweight buggy'],
+  kid:['Travel cot (villa doesn\'t provide)','High chair / booster (check with hosts)','Nappies / pull-ups','Favourite toys & books','Car snacks','Sun hat','Lightweight buggy'],
   nice:['Bluetooth speaker','Card games / board games','Camera','Birthday decorations','Cake candles','French phrasebook (fun for the group)']
 };
 function renderPacking(){
