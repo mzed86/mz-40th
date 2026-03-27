@@ -895,8 +895,11 @@ if(auth.isSignInWithEmailLink(window.location.href)){
   let email=localStorage.getItem('mz40-signin-email');
   if(!email){
     // User opened the link on a different device/browser — need their email
-    // Show the login form so they can enter it, with a helpful message
-    showLoginSuccess('Almost there — enter your email to complete sign-in.');
+    // Update the UI so it doesn't say "get a magic link" (they already have one)
+    document.querySelector('.login-subtitle').textContent='Enter your email to complete sign-in';
+    document.getElementById('login-btn').textContent='Sign In';
+    document.querySelector('.login-hint').textContent='Enter the same email the magic link was sent to';
+    showLoginSuccess('Almost there — enter your email to finish signing in.');
   } else {
     // Same browser: hide the login form and show a "signing in" state
     document.getElementById('email-form-state').style.display='none';
@@ -911,6 +914,10 @@ if(auth.isSignInWithEmailLink(window.location.href)){
         // Show error and let them retry via the normal form
         document.getElementById('magic-link-state').style.display='none';
         document.getElementById('email-form-state').style.display='';
+        document.querySelector('.login-subtitle').textContent='Enter your email to get a magic sign-in link';
+        document.getElementById('login-btn').textContent='Send Magic Link';
+        document.querySelector('.login-hint').textContent='Only invited guests can sign in';
+        window.history.replaceState(null,'',window.location.pathname);
         showLoginError(friendlyError(err.code));
       });
   }
