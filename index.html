@@ -120,6 +120,7 @@
   .claimed-badge{padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;}
   .claimed-badge.unclaimed{background:rgba(233,69,96,0.15);color:var(--accent);border:1px solid rgba(233,69,96,0.3);}
   .claimed-badge.claimed{background:rgba(74,222,128,0.15);color:var(--green);border:1px solid rgba(74,222,128,0.3);}
+  .claimed-badge.local{background:rgba(96,165,250,0.15);color:var(--blue);border:1px solid rgba(96,165,250,0.3);}
   .claim-btn{padding:6px 14px;border-radius:20px;font-size:0.78rem;font-weight:500;cursor:pointer;border:1px solid rgba(201,168,76,0.3);background:transparent;color:var(--gold);font-family:'Inter',sans-serif;transition:all 0.2s;}
   .claim-btn:hover{background:rgba(201,168,76,0.15);}
   .claim-btn.mine{background:var(--green);color:var(--dark);border-color:var(--green);}
@@ -670,9 +671,6 @@ function defaultBringItems(){return[
   {id:'b18',cat:'birthday',name:'Candles & decorations',note:'Banners, balloons, 4-0 candles',claimedBy:''},
   {id:'b20',cat:'gear',name:'Bluetooth speaker',note:'For the garden / pool',claimedBy:''},
   {id:'b21',cat:'gear',name:'Card games / board games',note:'',claimedBy:''},
-  {id:'b22',cat:'gear',name:'Pétanque set',note:'Villa has a court — does it have boules?',claimedBy:''},
-  {id:'b23',cat:'gear',name:'Travel cot',note:'Not provided by villa',claimedBy:''},
-  {id:'b24',cat:'gear',name:'High chair / booster seat',note:'Confirm with hosts',claimedBy:''},
   {id:'b25',cat:'gear',name:'Plug adaptors (Type E)',note:'French 2-pin sockets',claimedBy:''},
 ];}
 const CAT_LABELS={bbq:'BBQ & Cooking',drinks:'Drinks',breakfast:'Breakfast',birthday:'Birthday Bits',gear:'Gear & Equipment',other:'Other'};
@@ -692,12 +690,17 @@ function renderBringList(){
     html+=`<div class="bring-category"><div class="bring-category-header"><h4>${CAT_LABELS[cat]||cat}</h4><span style="font-size:0.8rem;color:var(--text-muted);">${claimed}/${items.length} claimed</span></div>`;
     items.forEach(item=>{
       const isMine=item.claimedBy===state.voter;
-      const badge=item.claimedBy
-        ?`<span class="claimed-badge claimed">${item.claimedBy}</span>`
-        :`<span class="claimed-badge unclaimed">Unclaimed</span>`;
-      const btn=item.claimedBy
-        ?(isMine?`<button class="claim-btn mine" onclick="unclaimItem('${item.id}')">Drop</button>`:'')
-        :`<button class="claim-btn" onclick="claimItem('${item.id}')">I'll bring this</button>`;
+      let badge, btn;
+      if(item.claimedBy){
+        badge=`<span class="claimed-badge claimed">${item.claimedBy}</span>`;
+        btn=isMine?`<button class="claim-btn mine" onclick="unclaimItem('${item.id}')">Drop</button>`:'';
+      }else if(item.local){
+        badge=`<span class="claimed-badge local">Get it there</span>`;
+        btn=`<button class="claim-btn" onclick="unmarkLocal('${item.id}')">Undo</button>`;
+      }else{
+        badge=`<span class="claimed-badge unclaimed">Unclaimed</span>`;
+        btn=`<button class="claim-btn" onclick="claimItem('${item.id}')">I'll bring this</button><button class="claim-btn" onclick="markLocal('${item.id}')">Get it there</button>`;
+      }
       html+=`<div class="bring-item"><div class="bring-item-left"><div><div class="bring-item-name">${item.name}</div>${item.note?`<div class="bring-item-note">${item.note}</div>`:''}</div></div><div class="bring-item-right">${badge}${btn}</div></div>`;
     });
     html+=`</div>`;
@@ -706,11 +709,20 @@ function renderBringList(){
 }
 function claimItem(id){
   if(!currentGuest)return;
-  const item=state.bringItems.find(i=>i.id===id);if(item)item.claimedBy=state.voter;
+  const item=state.bringItems.find(i=>i.id===id);if(item){item.claimedBy=state.voter;item.local=false;}
   renderBringList();saveState();
 }
 function unclaimItem(id){
   const item=state.bringItems.find(i=>i.id===id);if(item&&item.claimedBy===currentGuest)item.claimedBy='';
+  renderBringList();saveState();
+}
+function markLocal(id){
+  if(!currentGuest)return;
+  const item=state.bringItems.find(i=>i.id===id);if(item){item.local=true;item.claimedBy='';}
+  renderBringList();saveState();
+}
+function unmarkLocal(id){
+  const item=state.bringItems.find(i=>i.id===id);if(item)item.local=false;
   renderBringList();saveState();
 }
 function addBringItem(){
